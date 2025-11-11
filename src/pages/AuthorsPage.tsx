@@ -4,6 +4,8 @@ import { AUTHORS_MOCK } from "../api/mock";
 import { type Author } from "../api/types";
 import { AuthorCard } from "../components/AuthorCard";
 import { Search, Users, UserSearch } from "lucide-react";
+import { Breadcrumbs } from "../components/Breadcrumbs";
+import { ROUTE_LABELS } from "../routes";
 
 export const AuthorsPage: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,6 +17,7 @@ export const AuthorsPage: FC = () => {
 
   return (
     <div>
+      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.AUTHORS }]} />
       <div className="search-and-summary">
         <form action="" method="get" className="search-form">
           <Search className="lucide-search" strokeWidth={3} />

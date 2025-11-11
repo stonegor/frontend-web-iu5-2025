@@ -1,12 +1,15 @@
 import { type FC } from "react";
 import { UserSearch } from "lucide-react";
 import { AUTHORS_MOCK } from "../api/mock";
+import { Breadcrumbs } from "../components/Breadcrumbs";
+import { ROUTE_LABELS } from "../routes";
 
 export const PredictionPage: FC = () => {
   const authors = AUTHORS_MOCK;
 
   return (
     <div className="prediction-detail-container">
+      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.PREDICTION }]} />
       <h1 className="page-title">
         <UserSearch strokeWidth={3} />
         <span>Поиск Автора по тексту</span>

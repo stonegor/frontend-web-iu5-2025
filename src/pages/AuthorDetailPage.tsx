@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { User } from "lucide-react";
 import { getAuthorById } from "../api/authors";
 import { type Author } from "../api/types";
+import { Breadcrumbs } from "../components/Breadcrumbs";
+import { ROUTES, ROUTE_LABELS } from "../routes";
 
 export const AuthorDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +38,12 @@ export const AuthorDetailPage: FC = () => {
 
   return (
     <div>
+      <Breadcrumbs
+        crumbs={[
+          { label: ROUTE_LABELS.AUTHORS, path: ROUTES.AUTHORS },
+          { label: author.name },
+        ]}
+      />
       <h1 className="page-title">
         <User strokeWidth={3} />
         <span>{author.name}</span>
