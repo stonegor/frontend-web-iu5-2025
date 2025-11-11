@@ -1,8 +1,9 @@
 import { type FC, useState } from "react";
 import { Link } from "react-router-dom";
 import { AUTHORS_MOCK } from "../api/mock";
-import type { Author } from "../api/types";
+import { type Author } from "../api/types";
 import { AuthorCard } from "../components/AuthorCard";
+import { Search, Users, UserSearch } from "lucide-react";
 
 export const AuthorsPage: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,21 +17,7 @@ export const AuthorsPage: FC = () => {
     <div>
       <div className="search-and-summary">
         <form action="" method="get" className="search-form">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-search"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
+          <Search className="lucide-search" strokeWidth={3} />
           <input
             type="text"
             name="author_name"
@@ -42,23 +29,7 @@ export const AuthorsPage: FC = () => {
       </div>
 
       <h1 className="page-title">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-users"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
+        <Users strokeWidth={3} />
         <span>Авторы</span>
       </h1>
 
@@ -78,23 +49,7 @@ export const AuthorsPage: FC = () => {
             </div>
             <div className="prediction-right">
               Продолжить
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-user-search"
-              >
-                <circle cx="10" cy="7" r="4" />
-                <path d="M10.3 21H1" />
-                <path d="m21 21-1.9-1.9" />
-                <circle cx="17" cy="17" r="3" />
-              </svg>
+              <UserSearch strokeWidth={3} />
             </div>
           </div>
         </Link>
