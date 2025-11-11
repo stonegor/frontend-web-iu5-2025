@@ -1,7 +1,7 @@
 export interface Author {
   id: number;
   name: string;
-  about: string;
+  image_url: string;
   count_v: number;
   count_i: number;
   count_no: number;
@@ -10,17 +10,11 @@ export interface Author {
   count_zhe: number;
   count_ili: number;
   count_libo: number;
-  is_active: boolean;
-  image_url: string;
+  about: string;
 }
 
 export interface Prediction {
   id: number;
   text: string;
   authors: Author[];
-}
-
-export interface PredictionResult {
-  author: Author;
-  probability: number;
 }
