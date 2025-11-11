@@ -1,0 +1,17 @@
+.custom-navbar {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.custom-nav-link {
+  font-family: "Inter", "Source Sans Pro", Helvetica, sans-serif;
+  text-decoration: none !important;
+  font-weight: bold;
+  color: #333 !important;
+  padding: 0 !important;
+}
+
+.custom-nav-link:hover {
+  color: #007bff !important;
+}

@@ -1,13 +1,17 @@
 import { type FC, type PropsWithChildren } from "react";
 import { Link } from "react-router-dom";
+import AppNavbar from "./Navbar";
 
 export const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <>
       <header className="app-header">
-        <Link to="/" className="home-button">
-          Домой
-        </Link>
+        <div className="header-container">
+          <Link to="/" className="home-button">
+            Домой
+          </Link>
+          <AppNavbar />
+        </div>
       </header>
       <main className="main-container">{children}</main>
     </>

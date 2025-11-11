@@ -1,5 +1,4 @@
 import { type FC } from "react";
-import { Link } from "react-router-dom";
 
 export const HomePage: FC = () => {
   return (
@@ -11,14 +10,6 @@ export const HomePage: FC = () => {
         Выберите одного или нескольких авторов для сравнения и введите текст для
         анализа.
       </p>
-      <Link to="/authors" className="meal-link">
-        <button
-          className="add-button"
-          style={{ padding: "1rem 2rem", fontSize: "1.2rem" }}
-        >
-          К авторам
-        </button>
-      </Link>
     </div>
   );
 };

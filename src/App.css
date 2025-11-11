@@ -40,12 +40,20 @@ h3 {
 .app-header {
     background-color: #ffffff;
     height: 60px;
-    padding: 0 30px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    box-sizing: border-box;
 }
 
 
