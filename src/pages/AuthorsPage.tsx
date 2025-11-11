@@ -1,15 +1,20 @@
-import { type FC, useState } from "react";
+import { type FC, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AUTHORS_MOCK } from "../api/mock";
+import { getAuthors } from "../api/authors";
 import { type Author } from "../api/types";
 import { AuthorCard } from "../components/AuthorCard";
 import { Search, Users, UserSearch } from "lucide-react";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
+import { showPrediction } from "../config";
 
 export const AuthorsPage: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [authors] = useState<Author[]>(AUTHORS_MOCK);
+  const [authors, setAuthors] = useState<Author[]>([]);
+
+  useEffect(() => {
+    getAuthors().then(setAuthors);
+  }, []);
 
   const filteredAuthors = authors.filter((author) =>
     author.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -43,7 +48,11 @@ export const AuthorsPage: FC = () => {
       </div>
 
       <div className="meal-button-container">
-        <Link to="/prediction" className="meal-link">
+        <Link
+          to={showPrediction ? "/prediction" : "#"}
+          className={`meal-link ${!showPrediction ? "disabled" : ""}`}
+          onClick={(e) => !showPrediction && e.preventDefault()}
+        >
           <div className="prediction-button">
             <div className="prediction-left">
               Выбрано

@@ -5,6 +5,7 @@ import { getAuthorById } from "../api/authors";
 import { type Author } from "../api/types";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTES, ROUTE_LABELS } from "../routes";
+import defaultAuthor from "/public/default-author.svg";
 
 export const AuthorDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,7 +53,7 @@ export const AuthorDetailPage: FC = () => {
       <div className="nutrient is-promoted card usa-card__container clearfix author-card-huge">
         <div className="usa-card__media">
           <img
-            src={author.image_url}
+            src={author.image_url ?? defaultAuthor}
             alt={author.name}
             className="card-image"
           />

@@ -2,6 +2,8 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { type Author } from "../api/types";
 import { Plus } from "lucide-react";
+import defaultAuthor from "/public/default-author.svg";
+import { showPrediction } from "../config";
 
 interface AuthorCardProps {
   author: Author;
@@ -13,7 +15,7 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author }) => {
       <Link to={`/author/${author.id}`} rel="bookmark">
         <div className="usa-card__media">
           <img
-            src={author.image_url}
+            src={author.image_url ?? defaultAuthor}
             alt={author.name}
             className="card-image"
           />
@@ -37,11 +39,13 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author }) => {
               <p>либо: {author.count_libo}</p>
             </div>
           </div>
-          <form method="post" action="">
-            <button className="add-button" type="submit">
-              Добавить <Plus strokeWidth={2} />
-            </button>
-          </form>
+          {showPrediction && (
+            <form method="post" action="">
+              <button className="add-button" type="submit">
+                Добавить <Plus strokeWidth={2} />
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

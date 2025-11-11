@@ -187,6 +187,10 @@ h3 {
     transition: background-color 0.3s ease;
 }
 
+.meal-link.disabled {
+    pointer-events: none;
+}
+
 .meal-link.disabled .prediction-button {
     background-color: #BDBDBD;
     cursor: not-allowed;

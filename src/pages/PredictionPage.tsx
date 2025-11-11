@@ -1,11 +1,17 @@
-import { type FC } from "react";
+import { type FC, useState, useEffect } from "react";
 import { UserSearch } from "lucide-react";
-import { AUTHORS_MOCK } from "../api/mock";
+import { getAuthors } from "../api/authors";
+import { type Author } from "../api/types";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
+import defaultAuthor from "/public/default-author.svg";
 
 export const PredictionPage: FC = () => {
-  const authors = AUTHORS_MOCK;
+  const [authors, setAuthors] = useState<Author[]>([]);
+
+  useEffect(() => {
+    getAuthors().then(setAuthors);
+  }, []);
 
   return (
     <div className="prediction-detail-container">
@@ -30,7 +36,7 @@ export const PredictionPage: FC = () => {
           <div className="card" key={author.id}>
             <div className="card-image-container">
               <img
-                src={author.image_url}
+                src={author.image_url ?? defaultAuthor}
                 alt={author.name}
                 className="card-image"
               />

@@ -1,0 +1,1 @@
+export const showPrediction = false;
