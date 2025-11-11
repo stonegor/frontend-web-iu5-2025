@@ -1,11 +1,34 @@
-import { type FC } from "react";
+import { type FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AUTHORS_MOCK } from "../api/mock";
 import { User } from "lucide-react";
+import { getAuthorById } from "../api/authors";
+import { type Author } from "../api/types";
 
 export const AuthorDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>();
-  const author = AUTHORS_MOCK.find((a) => a.id === Number(id));
+  const [author, setAuthor] = useState<Author | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      setLoading(true);
+      getAuthorById(Number(id))
+        .then((authorData) => {
+          if (authorData) {
+            setAuthor(authorData);
+          } else {
+            setAuthor(null);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [id]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!author) {
     return <div>Автор не найден</div>;
