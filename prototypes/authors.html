@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Список авторов{% endblock %}
+
+{% block page_content %}
+
+<div class="search-and-summary">
+    <form action="{% url 'authors' %}" method="get" class="search-form">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-search">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input type="text" name="author_name" value="{{ search_query|default:'' }}" placeholder="Найти автора">
+    </form>
+</div>
+
+<h1 class="page-title">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+    <span>Авторы</span>
+</h1>
+
+<div class="cards-grid">
+    {% for author in authors %}
+    <div class="nutrient is-promoted card usa-card__container clearfix">
+        <a href="{% url 'author' author.id %}" rel="bookmark">
+            <div class="usa-card__media">
+                <img src="{{ author.image_url }}" alt="{{ author.name }}" class="card-image">
+            </div>
+        </a>
+        <div class="card-content">
+            <h2 class="card-title usa-card__heading">{{ author.name }}</h2>
+            <p class="card-subtitle">В среднем на 100 слов:</p>
+            <div class="card-footer">
+                <div class="stats-grid">
+                    <div class="column">
+                        <p>в: {{ author.count_v }}</p>
+                        <p>и: {{ author.count_i }}</p>
+                        <p>но: {{ author.count_no }}</p>
+                        <p>ли: {{ author.count_li }}</p>
+                    </div>
+                    <div class="column">
+                        <p>да: {{ author.count_da }}</p>
+                        <p>же: {{ author.count_zhe }}</p>
+                        <p>или: {{ author.count_ili }}</p>
+                        <p>либо: {{ author.count_libo }}</p>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'add_author_to_prediction' author.id %}">
+                    {% csrf_token %}
+                    <button class="add-button" type="submit">
+                        Добавить <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="lucide lucide-plus">
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Авторы по вашему запросу не найдены.</p>
+    {% endfor %}
+</div>
+
+<div class="meal-button-container">
+    <a href="{% if prediction_101_authors > 0 and draft_prediction %}{% url 'prediction' draft_prediction.id %}{% else %}#{% endif %}"
+       class="meal-link {% if prediction_101_authors == 0 %}disabled{% endif %}">
+        <div class="prediction-button">
+            <div class="prediction-left">
+                Выбрано<br>авторов: {{ prediction_101_authors }}
+            </div>
+            <div class="prediction-right">
+                Продолжить
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-user-search">
+                    <circle cx="10" cy="7" r="4" />
+                    <path d="M10.3 21H1" />
+                    <path d="m21 21-1.9-1.9" />
+                    <circle cx="17" cy="17" r="3" />
+                </svg>
+            </div>
+        </div>
+    </a>
+</div>
+
+{% endblock %}
