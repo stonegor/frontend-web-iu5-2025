@@ -1,7 +1,7 @@
 export interface Author {
   id: number;
   name: string;
-  image_url: string;
+  image_url?: string;
   count_v: number;
   count_i: number;
   count_no: number;

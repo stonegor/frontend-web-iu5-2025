@@ -4,7 +4,7 @@ import { getAuthors } from "../api/authors";
 import { type Author } from "../api/types";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
-import defaultAuthor from "/public/default-author.svg";
+import defaultAuthor from "/AuthorPlaceholder.png";
 
 export const PredictionPage: FC = () => {
   const [authors, setAuthors] = useState<Author[]>([]);
@@ -36,7 +36,7 @@ export const PredictionPage: FC = () => {
           <div className="card" key={author.id}>
             <div className="card-image-container">
               <img
-                src={author.image_url ?? defaultAuthor}
+                src={author.image_url || defaultAuthor}
                 alt={author.name}
                 className="card-image"
               />

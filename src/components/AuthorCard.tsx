@@ -2,7 +2,7 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { type Author } from "../api/types";
 import { Plus } from "lucide-react";
-import defaultAuthor from "/public/default-author.svg";
+import defaultAuthor from "/AuthorPlaceholder.png";
 import { showPrediction } from "../config";
 
 interface AuthorCardProps {
@@ -15,7 +15,7 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author }) => {
       <Link to={`/author/${author.id}`} rel="bookmark">
         <div className="usa-card__media">
           <img
-            src={author.image_url ?? defaultAuthor}
+            src={author.image_url || defaultAuthor}
             alt={author.name}
             className="card-image"
           />
