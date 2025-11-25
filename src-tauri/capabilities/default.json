@@ -9,7 +9,7 @@
     "cors-fetch:default",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "http://192.168.1.100" }],
+      "allow": [{ "url": "http://192.168.1.2" }],
       "deny": []
     },
     "core:default",
