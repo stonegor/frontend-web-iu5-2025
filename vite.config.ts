@@ -1,15 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { dest_root, api_proxy_addr } from './src/target_config'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  base: '/frontend-web-iu5-2025/',
+export default defineConfig(({ }) => ({
+  base: dest_root,
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'AuthorPlaceholder.png'],
       manifest: {
         name: 'Author Predictor',
         short_name: 'AuthorAI',
@@ -34,9 +35,9 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: api_proxy_addr,
         changeOrigin: true,
       },
     },
   },
-})
+}))
