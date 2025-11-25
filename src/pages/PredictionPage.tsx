@@ -1,17 +1,15 @@
-import { type FC, useState, useEffect } from "react";
+import { type FC } from "react";
 import { UserSearch } from "lucide-react";
-import { getAuthors } from "../api/authors";
 import { type Author } from "../api/types";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
 import defaultAuthor from "/AuthorPlaceholder.png";
+import { GetData } from "../getData";
+import { useAuthors } from "../slices/authorsSlice";
 
 export const PredictionPage: FC = () => {
-  const [authors, setAuthors] = useState<Author[]>([]);
-
-  useEffect(() => {
-    getAuthors().then(setAuthors);
-  }, []);
+  GetData();
+  const authors = useAuthors();
 
   return (
     <div className="prediction-detail-container">

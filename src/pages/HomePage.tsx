@@ -1,22 +1,27 @@
 import { type FC, useEffect, useState } from "react";
 import Carousel from "react-bootstrap/Carousel";
-import { getAuthors } from "../api/authors";
 import { type Author } from "../api/types";
+import { GetData } from "../getData";
+import { useAuthors } from "../slices/authorsSlice";
 
 export const HomePage: FC = () => {
-  const [authors, setAuthors] = useState<Author[]>([]);
+  // Fetch data into Redux store
+  GetData();
+  
+  // Select data from Redux store
+  const allAuthors = useAuthors();
+  const [displayedAuthors, setDisplayedAuthors] = useState<Author[]>([]);
 
+  // Update local displayed state when authors change
   useEffect(() => {
-    getAuthors().then((data) => {
-      setAuthors(
-        data.filter(
-          (a) =>
-            a.image_url &&
-            (a.image_url.startsWith("http") || a.image_url.startsWith("/"))
-        )
-      );
-    });
-  }, []);
+    setDisplayedAuthors(
+      allAuthors.filter(
+        (a) =>
+          a.image_url &&
+          (a.image_url.startsWith("http") || a.image_url.startsWith("/"))
+      )
+    );
+  }, [allAuthors]);
 
   return (
     <div style={{ textAlign: "center", paddingTop: "5rem" }}>
@@ -28,17 +33,17 @@ export const HomePage: FC = () => {
         анализа.
       </p>
 
-      {authors.length > 0 && (
+      {displayedAuthors.length > 0 && (
         <div style={{ maxWidth: "900px", margin: "3rem auto" }}>
           <Carousel interval={5000} pause="hover">
-            {authors.map((author) => (
+            {displayedAuthors.map((author) => (
               <Carousel.Item key={author.id}>
                 <img
                   className="d-block w-100"
                   src={author.image_url}
                   alt={author.name}
                   onError={() => {
-                    setAuthors((prev) =>
+                    setDisplayedAuthors((prev) =>
                       prev.filter((a) => a.id !== author.id)
                     );
                   }}
