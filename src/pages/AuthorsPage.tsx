@@ -1,20 +1,20 @@
-import { type FC, useState, useEffect } from "react";
+import { type FC } from "react";
 import { Link } from "react-router-dom";
-import { getAuthors } from "../api/authors";
-import { type Author } from "../api/types";
 import { AuthorCard } from "../components/AuthorCard";
 import { Search, Users, UserSearch } from "lucide-react";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
 import { showPrediction } from "../config";
+import { useDispatch } from "react-redux";
+import { useAuthors, useFilter, setFilterAction } from "../slices/authorsSlice";
+import { GetData } from "../getData";
 
 export const AuthorsPage: FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [authors, setAuthors] = useState<Author[]>([]);
-
-  useEffect(() => {
-    getAuthors().then(setAuthors);
-  }, []);
+  const dispatch = useDispatch();
+  GetData();
+  
+  const authors = useAuthors();
+  const searchQuery = useFilter();
 
   const filteredAuthors = authors.filter((author) =>
     author.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -30,7 +30,7 @@ export const AuthorsPage: FC = () => {
             type="text"
             name="author_name"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => dispatch(setFilterAction(e.target.value))}
             placeholder="Найти автора"
           />
         </form>

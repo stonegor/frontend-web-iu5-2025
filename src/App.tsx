@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { type FC } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { AuthorsPage } from "./pages/AuthorsPage";
