@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ }) => ({
   base: '/frontend-web-iu5-2025/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'AuthorPlaceholder.png'],
       manifest: {
         name: 'Author Predictor',
         short_name: 'AuthorAI',
@@ -39,4 +39,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

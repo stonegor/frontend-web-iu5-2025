@@ -740,14 +740,10 @@ h3 {
 
     .header-container {
         padding: 0 15px;
-        flex-direction: column;
-        gap: 10px;
-        height: auto;
-        padding-bottom: 10px;
     }
     
     .app-header {
-        height: auto;
+        height: 60px;
     }
 
     .cards-grid {
