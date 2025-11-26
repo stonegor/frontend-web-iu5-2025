@@ -1,9 +1,10 @@
 import type { Author } from './types'
+import { API_BASE_URL } from '../config'
 import { AUTHORS_MOCK } from './mock'
 
 export const getAuthors = async (): Promise<Author[]> => {
   try {
-    const response = await fetch('/api/authors')
+    const response = await fetch(`${API_BASE_URL}/api/authors`)
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }
@@ -16,7 +17,7 @@ export const getAuthors = async (): Promise<Author[]> => {
 
 export const getAuthorById = async (id: number): Promise<Author | undefined> => {
   try {
-    const response = await fetch(`/api/authors/${id}`)
+    const response = await fetch(`${API_BASE_URL}/api/authors/${id}`)
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }
