@@ -1,12 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import mkcert from 'vite-plugin-mkcert'
+import fs from 'fs'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
   base: '/frontend-web-iu5-2025/',
   plugins: [
     react(),
+    mkcert(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'AuthorPlaceholder.png'],
@@ -31,6 +35,10 @@ export default defineConfig(() => ({
     })
   ],
   server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),
+    },
     port: 3000,
     proxy: {
       '/api': {
