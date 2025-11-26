@@ -3,6 +3,7 @@ import Carousel from "react-bootstrap/Carousel";
 import { type Author } from "../api/types";
 import { GetData } from "../getData";
 import { useAuthors } from "../slices/authorsSlice";
+import defaultAuthor from "/AuthorPlaceholder.png";
 
 export const HomePage: FC = () => {
   // Fetch data into Redux store
@@ -42,10 +43,8 @@ export const HomePage: FC = () => {
                   className="d-block w-100"
                   src={author.image_url}
                   alt={author.name}
-                  onError={() => {
-                    setDisplayedAuthors((prev) =>
-                      prev.filter((a) => a.id !== author.id)
-                    );
+                  onError={(e) => {
+                    e.currentTarget.src = defaultAuthor;
                   }}
                   style={{
                     height: "450px",

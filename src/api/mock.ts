@@ -1,10 +1,11 @@
 import type { Author } from "./types";
+import defaultAuthor from "/AuthorPlaceholder.png";
 
 export const AUTHORS_MOCK: Author[] = [
   {
     id: 1,
-    name: "Автор 1",
-    image_url: "",
+    name: "Mock Author 1",
+    image_url: defaultAuthor,
     count_v: 1,
     count_i: 2,
     count_no: 3,
@@ -13,12 +14,12 @@ export const AUTHORS_MOCK: Author[] = [
     count_zhe: 6,
     count_ili: 7,
     count_libo: 8,
-    about: "some info",
+    about: "This is a mock author for development purposes.",
   },
   {
     id: 2,
-    name: "Автор 2",
-    image_url: "",
+    name: "Mock Author 2",
+    image_url: defaultAuthor,
     count_v: 1,
     count_i: 2,
     count_no: 3,
@@ -27,6 +28,6 @@ export const AUTHORS_MOCK: Author[] = [
     count_zhe: 6,
     count_ili: 7,
     count_libo: 8,
-    about: "some info",
+    about: "This is another mock author for development purposes.",
   },
 ];
