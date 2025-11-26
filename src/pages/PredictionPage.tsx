@@ -1,6 +1,5 @@
 import { type FC } from "react";
 import { UserSearch } from "lucide-react";
-import { type Author } from "../api/types";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
 import defaultAuthor from "/AuthorPlaceholder.png";
