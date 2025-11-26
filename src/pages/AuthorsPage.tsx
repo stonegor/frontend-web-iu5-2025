@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { type FC, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthorCard } from "../components/AuthorCard";
 import { Search, Users, UserSearch } from "lucide-react";
@@ -8,6 +8,7 @@ import { showPrediction } from "../config";
 import { useDispatch } from "react-redux";
 import { useAuthors, useFilter, setFilterAction } from "../slices/authorsSlice";
 import { GetData } from "../getData";
+import { getDraftPrediction } from "../api/predictions";
 
 export const AuthorsPage: FC = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,15 @@ export const AuthorsPage: FC = () => {
   
   const authors = useAuthors();
   const searchQuery = useFilter();
+  const [predictionCount, setPredictionCount] = useState(0);
+
+  useEffect(() => {
+    getDraftPrediction().then((data) => {
+      if (data && data.authors) {
+        setPredictionCount(data.authors.length);
+      }
+    });
+  }, []);
 
   const filteredAuthors = authors.filter((author) =>
     author.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -57,7 +67,7 @@ export const AuthorsPage: FC = () => {
             <div className="prediction-left">
               Выбрано
               <br />
-              авторов: 0
+              авторов: {predictionCount}
             </div>
             <div className="prediction-right">
               Продолжить
