@@ -607,6 +607,18 @@ h3 {
     object-fit: cover;
 }
 
+.results-cards .card-details {
+    margin-top: 2px;
+}
+
+.results-cards .card-stats {
+    font-size: 0.8rem;
+}
+
+.results-cards .probability-display {
+    font-size: 0.8rem;
+}
+
 
 /* --- Minimal Carousel Styles for React-Bootstrap --- */
 .carousel {
