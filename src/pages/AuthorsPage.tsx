@@ -1,15 +1,13 @@
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AuthorCard } from "../components/AuthorCard";
 import { Search, Users, UserSearch } from "lucide-react";
 import { Breadcrumbs } from "../components/Breadcrumbs";
-import { ROUTE_LABELS } from "../routes";
-import { showPrediction } from "../config";
-import { useDispatch } from "react-redux";
+import { ROUTE_LABELS, ROUTES } from "../routes";
+import { useDispatch, useSelector } from "react-redux";
 import { useAuthors, useFilter, setFilterAction, getAuthorsList, useAuthorsLoading } from "../slices/authorsSlice";
-import { getDraftPrediction } from "../api/predictions";
 import { Spinner } from "react-bootstrap";
-import type { AppDispatch } from "../store";
+import type { AppDispatch, RootState } from "../store";
 
 export const AuthorsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,27 +15,26 @@ export const AuthorsPage: FC = () => {
   const authors = useAuthors();
   const searchQuery = useFilter();
   const loading = useAuthorsLoading();
-  const [predictionCount, setPredictionCount] = useState(0);
+  
+  const { isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { prediction_id, count } = useSelector((state: RootState) => state.predictions);
 
   useEffect(() => {
     dispatch(getAuthorsList());
-    getDraftPrediction().then((data) => {
-      if (data && data.count) {
-        setPredictionCount(data.count);
-      }
-    });
   }, [dispatch]);
 
   const handleSearch = (e: React.FormEvent) => {
       e.preventDefault();
       dispatch(getAuthorsList());
   };
+  
+  const isCartActive = isAuthenticated && prediction_id && !isNaN(prediction_id);
 
   return (
     <div>
       <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.AUTHORS }]} />
-      <div className="search-and-summary">
-        <form onSubmit={handleSearch} className="search-form">
+      <div className="search-and-summary d-flex align-items-center gap-2">
+        <form onSubmit={handleSearch} className="search-form flex-grow-1">
           <button type="submit" disabled={loading} className="search-icon-btn">
             <Search className="lucide-search" strokeWidth={3} />
           </button>
@@ -76,15 +73,15 @@ export const AuthorsPage: FC = () => {
 
       <div className="meal-button-container">
         <Link
-          to={showPrediction ? "/prediction" : "#"}
-          className={`meal-link ${!showPrediction ? "disabled" : ""}`}
-          onClick={(e) => !showPrediction && e.preventDefault()}
+          to={isCartActive ? `${ROUTES.PREDICTION}/${prediction_id}` : "#"}
+          className={`meal-link ${!isCartActive ? "disabled" : ""}`}
+          onClick={(e) => !isCartActive && e.preventDefault()}
         >
           <div className="prediction-button">
             <div className="prediction-left">
               Выбрано
               <br />
-              авторов: {predictionCount}
+              авторов: {count || 0}
             </div>
             <div className="prediction-right">
               Продолжить
@@ -96,5 +93,3 @@ export const AuthorsPage: FC = () => {
     </div>
   );
 };
-
-

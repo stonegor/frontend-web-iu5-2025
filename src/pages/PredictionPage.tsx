@@ -1,77 +1,104 @@
-import { type FC, useEffect } from "react";
-import { UserSearch } from "lucide-react";
+import { type FC, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store";
+import { getPrediction, deletePrediction, updatePrediction } from "../slices/predictionsSlice";
 import { Breadcrumbs } from "../components/Breadcrumbs";
-import { ROUTE_LABELS } from "../routes";
-import defaultAuthor from "/AuthorPlaceholder.png";
-import { useAuthors, getAuthorsList } from "../slices/authorsSlice";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../store";
+import { ROUTE_LABELS, ROUTES } from "../routes";
+import { UserSearch, Save, Trash2 } from "lucide-react";
+import { Form, Button, Alert } from "react-bootstrap";
+import { AuthorCard } from "../components/AuthorCard";
+import type { Author } from "../api/Api";
 
 export const PredictionPage: FC = () => {
+  const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
-  const authors = useAuthors();
+  const navigate = useNavigate();
+
+  const { authors, predictionData, isDraft, error } = useSelector((state: RootState) => state.predictions);
+  
+  const [corpus, setCorpus] = useState("");
 
   useEffect(() => {
-    dispatch(getAuthorsList());
-  }, [dispatch]);
+    if (id) {
+      dispatch(getPrediction(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (predictionData.corpus) {
+      setCorpus(predictionData.corpus);
+    }
+  }, [predictionData]);
+
+  const handleDelete = async () => {
+    if (id) {
+      await dispatch(deletePrediction(id));
+      navigate(ROUTES.AUTHORS);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (id) {
+       await dispatch(updatePrediction({ id, data: { corpus } }));
+    }
+  };
+
+  if (!id) return <div>No ID provided</div>;
 
   return (
     <div className="prediction-detail-container">
-      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.PREDICTION }]} />
-      <h1 className="page-title">
-        <UserSearch strokeWidth={3} />
-        <span>Поиск Автора по тексту</span>
-      </h1>
+       <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.PREDICTION }]} />
+       
+       <div className="container-2 mt-4">
+           {error && <Alert variant="danger">{error}</Alert>}
+           
+           <div className="d-flex justify-content-between align-items-center mb-4">
+               <h1><UserSearch /> Предсказание {id}</h1>
+               {isDraft && (
+                   <Button variant="danger" onClick={handleDelete} className="d-flex align-items-center gap-2">
+                       Очистить <Trash2 size={16} />
+                   </Button>
+               )}
+           </div>
 
-      <div className="search-and-summary">
-        <form action="" method="get" className="search-form prediction-form">
-          <textarea
-            name="author_name"
-            placeholder="Введите текст для анализа"
-          ></textarea>
-        </form>
-      </div>
+           {/* Prediction Data Form */}
+           <Form onSubmit={handleSave} className="mb-4">
+               <Form.Group className="mb-3">
+                   <Form.Label>Корпус текстов</Form.Label>
+                   <Form.Control 
+                        as="textarea" 
+                        rows={3} 
+                        value={corpus} 
+                        onChange={(e) => setCorpus(e.target.value)}
+                        disabled={!isDraft}
+                   />
+               </Form.Group>
+               {isDraft && (
+                   <Button type="submit" variant="primary" className="d-flex align-items-center gap-2">
+                       Сохранить <Save size={16} />
+                   </Button>
+               )}
+           </Form>
 
-      <h2 className="authors-list-header">Результаты</h2>
-      <div className="results-cards">
-        {authors.map((author, index) => (
-          <div className="card" key={author.id || index}>
-            <div className="card-image-container">
-              <img
-                src={author.image_url || defaultAuthor}
-                alt={author.name}
-                className="card-image"
-              />
-            </div>
-            <div className="card-main-content">
-              <h3 className="card-title">{author.name}</h3>
-              <div className="card-details">
-                <p className="card-stats">
-                  в: {author.count_v}, и: {author.count_i}, не:{" "}
-                  {author.count_no}, ли: {author.count_li}, да:{" "}
-                  {author.count_da}, же: {author.count_zhe}, или:{" "}
-                  {author.count_ili}, либо: {author.count_libo}
-                </p>
-                <div className="dropdown">
-                  <label htmlFor={`period-${author.id || index}`}>Период:</label>
-                  <select name="period" id={`period-${author.id || index}`}>
-                    <option value="early">Ранний</option>
-                    <option value="mature">Зрелый</option>
-                    <option value="late">Поздний</option>
-                  </select>
-                </div>
-                <div className="probability-display">Вероятность: 0.5</div>
-              </div>
-            </div>
-            <div className="card-actions"></div>
-          </div>
-        ))}
-      </div>
-      <form method="post" action="">
-        <button type="submit" className="delete-button">
-          Удалить
-        </button>
-      </form>
+           {/* Authors List */}
+           <h2>Выбранные авторы</h2>
+           <div className="cards-grid">
+               {authors.length > 0 ? (
+                   authors.map((item, index) => (
+                       <AuthorCard 
+                            key={(item.author as Author).id || index} 
+                            author={item.author as Author} 
+                            isDraft={isDraft}
+                            predictionId={Number(id)}
+                       />
+                   ))
+               ) : (
+                   <p>Нет выбранных авторов.</p>
+               )}
+           </div>
+       </div>
     </div>
   );
 };

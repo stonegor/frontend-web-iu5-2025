@@ -5,12 +5,14 @@ import { AuthorsPage } from "./pages/AuthorsPage";
 import { AuthorDetailPage } from "./pages/AuthorDetailPage";
 import { PredictionPage } from "./pages/PredictionPage";
 import { HomePage } from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import { ROUTES } from "./routes";
 
 const App: FC = () => {
   return (
     <Routes>
       <Route
-        path="/"
+        path={ROUTES.HOME}
         element={
           <Layout>
             <HomePage />
@@ -18,7 +20,7 @@ const App: FC = () => {
         }
       />
       <Route
-        path="/authors"
+        path={ROUTES.AUTHORS}
         element={
           <Layout>
             <AuthorsPage />
@@ -26,7 +28,7 @@ const App: FC = () => {
         }
       />
       <Route
-        path="/author/:id"
+        path={ROUTES.AUTHOR_DETAIL}
         element={
           <Layout>
             <AuthorDetailPage />
@@ -34,10 +36,18 @@ const App: FC = () => {
         }
       />
       <Route
-        path="/prediction"
+        path={`${ROUTES.PREDICTION}/:id`}
         element={
           <Layout>
             <PredictionPage />
+          </Layout>
+        }
+      />
+      <Route
+        path={ROUTES.LOGIN}
+        element={
+          <Layout>
+            <LoginPage />
           </Layout>
         }
       />

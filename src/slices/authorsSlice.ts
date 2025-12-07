@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { api } from "../api";
 import type { Author } from "../api/Api";
 import { AUTHORS_MOCK } from "../api/mock";
+import { setPredictionId, setCount } from "./predictionsSlice";
 
 interface AuthorsState {
     authors: Author[];
@@ -24,10 +25,24 @@ const initialState: AuthorsState = {
 
 export const getAuthorsList = createAsyncThunk(
     'authors/getAuthorsList',
-    async (_, { getState, rejectWithValue }) => {
+    async (_, { getState, dispatch, rejectWithValue }) => {
         const { authors } = getState() as RootState;
         try {
             const response = await api.authors.authorsList({ name: authors.filterValue });
+            
+            // Fetch draft info
+            try {
+                const draftResponse = await api.authorPredictions.authorPredictionsDraftIconList();
+                if (draftResponse.data) {
+                    dispatch(setPredictionId(draftResponse.data.id));
+                    dispatch(setCount(draftResponse.data.count));
+                }
+            } catch (e) {
+                // If error (e.g. not auth), clear draft info
+                dispatch(setPredictionId(NaN));
+                dispatch(setCount(NaN));
+            }
+
             return response.data;
         } catch (error) {
             console.error("Failed to fetch authors", error);
