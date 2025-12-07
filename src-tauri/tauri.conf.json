@@ -9,11 +9,7 @@
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
-  "plugins": {
-    "http": {
-      "enabled": true
-    }
-  },
+  "plugins": {},
   "app": {
     "withGlobalTauri": true,
     "windows": [

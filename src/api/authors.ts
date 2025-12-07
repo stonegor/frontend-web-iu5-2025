@@ -1,10 +1,13 @@
 import type { Author } from './types'
 import { AUTHORS_MOCK } from './mock'
-import { dest_api } from '../target_config'
+import { dest_api, target_tauri } from '../target_config'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http';
+
+const apiFetch = target_tauri ? tauriFetch : fetch;
 
 export const getAuthors = async (): Promise<Author[]> => {
   try {
-    const response = await fetch(`${dest_api}/authors`)
+    const response = await apiFetch(`${dest_api}/authors`)
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }
@@ -17,7 +20,7 @@ export const getAuthors = async (): Promise<Author[]> => {
 
 export const getAuthorById = async (id: number): Promise<Author | undefined> => {
   try {
-    const response = await fetch(`${dest_api}/authors/${id}`)
+    const response = await apiFetch(`${dest_api}/authors/${id}`)
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }

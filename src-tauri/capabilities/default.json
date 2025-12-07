@@ -7,14 +7,15 @@
   ],
   "permissions": [
     "cors-fetch:default",
+    "core:default",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "http://192.168.1.2" }],
+      "allow": [
+        {
+          "url": "http://192.168.1.2:8000/*"
+        }
+      ],
       "deny": []
-    },
-    "core:default",
-    "http:allow-fetch",
-    "http:allow-fetch-read-body",
-    "http:allow-fetch-send"
+    }
   ]
 }
