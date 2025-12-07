@@ -472,11 +472,14 @@ h3 {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    border-top: none;
+    background-color: transparent;
 }
 
 .stats-grid {
     display: flex;
     gap: 1rem;
+    background-color: white;
 }
 
 .column p {
