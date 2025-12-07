@@ -38,7 +38,9 @@ export const AuthorsPage: FC = () => {
       <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.AUTHORS }]} />
       <div className="search-and-summary">
         <form onSubmit={handleSearch} className="search-form">
-          <Search className="lucide-search" strokeWidth={3} />
+          <button type="submit" disabled={loading} className="search-icon-btn">
+            <Search className="lucide-search" strokeWidth={3} />
+          </button>
           <input
             type="text"
             name="author_name"
@@ -46,9 +48,6 @@ export const AuthorsPage: FC = () => {
             onChange={(e) => dispatch(setFilterAction(e.target.value))}
             placeholder="Найти автора"
           />
-          <button type="submit" disabled={loading} className="search-button-submit">
-              Найти
-          </button>
         </form>
       </div>
 
