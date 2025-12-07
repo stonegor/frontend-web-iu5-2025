@@ -8,6 +8,7 @@ import { ROUTE_LABELS, ROUTES } from "../routes";
 import { UserSearch } from "lucide-react";
 import { AuthorCard } from "../components/AuthorCard";
 import type { Author } from "../api/Api";
+import { StatusBadge } from "../components/StatusBadge";
 
 export const PredictionPage: FC = () => {
   const { id } = useParams();
@@ -19,7 +20,7 @@ export const PredictionPage: FC = () => {
   const [corpus, setCorpus] = useState("");
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== 'undefined') {
       dispatch(getPrediction(id));
     }
   }, [dispatch, id]);
@@ -43,30 +44,31 @@ export const PredictionPage: FC = () => {
       await dispatch(updatePrediction({ id, data: { corpus } }));
     }
   };
-  
+
   const handleSubmitPrediction = async () => {
-      if (id) {
-          await dispatch(submitPrediction(id));
-          navigate(ROUTES.PREDICTIONS); // Redirect to list after submit
+    if (id) {
+      try {
+        await dispatch(submitPrediction(id)).unwrap();
+        navigate(ROUTES.PREDICTIONS); // Redirect to list after submit
+      } catch (err) {
+        // Error is handled in slice
+        console.error("Failed to submit prediction:", err);
       }
+    }
   };
 
-  if (!id) return <div>No ID provided</div>;
+  if (!id || id === 'undefined' || id === 'null') return <div className="alert alert-warning">ID не найден или некорректен.</div>;
 
   return (
     <div className="prediction-detail-container">
       <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.PREDICTION }]} />
       <h1 className="page-title">
-        <UserSearch strokeWidth={3} />
-        <span>Поиск Автора по тексту</span>
+        <div className="d-flex align-items-center gap-3">
+          <UserSearch strokeWidth={3} />
+          <span>Предсказание</span>
+          {!isDraft && <StatusBadge status={predictionData.status} />}
+        </div>
       </h1>
-      
-      {/* Show status if not draft */}
-      {!isDraft && predictionData.status && (
-          <div className="alert alert-info">
-              Статус: {predictionData.status}
-          </div>
-      )}
 
       <div className="search-and-summary">
         <form className="search-form prediction-form">
@@ -101,12 +103,12 @@ export const PredictionPage: FC = () => {
 
       {isDraft && (
         <div className="d-flex justify-content-between mt-3">
-            <button className="action-button" onClick={handleDelete}>
-                Удалить
-            </button>
-            <button className="action-button" onClick={handleSubmitPrediction}>
-                Подтвердить
-            </button>
+          <button className="action-button" onClick={handleDelete}>
+            Удалить
+          </button>
+          <button className="action-button" onClick={handleSubmitPrediction}>
+            Подтвердить
+          </button>
         </div>
       )}
     </div>

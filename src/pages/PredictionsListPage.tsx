@@ -1,5 +1,5 @@
 import { type FC, useEffect } from "react";
-import { Table, Spinner, Badge } from "react-bootstrap";
+import { Table, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Breadcrumbs } from "../components/Breadcrumbs";
@@ -7,6 +7,7 @@ import { ROUTES, ROUTE_LABELS } from "../routes";
 import { getPredictionsList } from "../slices/predictionsSlice";
 import type { AppDispatch, RootState } from "../store";
 import { FileText } from "lucide-react";
+import { StatusBadge } from "../components/StatusBadge";
 
 export const PredictionsListPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,23 +17,6 @@ export const PredictionsListPage: FC = () => {
   useEffect(() => {
     dispatch(getPredictionsList());
   }, [dispatch]);
-
-  const getStatusBadge = (status: string | undefined) => {
-    switch (status) {
-      case "DRAFT":
-        return <Badge bg="secondary">Черновик</Badge>;
-      case "FORMED":
-        return <Badge bg="primary">Сформировано</Badge>;
-      case "COMPLETED":
-        return <Badge bg="success">Завершено</Badge>;
-      case "REJECTED":
-        return <Badge bg="danger">Отклонено</Badge>;
-      case "DELETED":
-        return <Badge bg="dark">Удалено</Badge>;
-      default:
-        return <Badge bg="light" text="dark">{status}</Badge>;
-    }
-  };
 
   return (
     <div className="container mt-4">
@@ -61,10 +45,10 @@ export const PredictionsListPage: FC = () => {
           </thead>
           <tbody>
             {predictionsList.length > 0 ? (
-              predictionsList.map((prediction: any, index) => (
+              predictionsList.map((prediction, index) => (
                 <tr key={prediction.id || index}>
                   <td>{prediction.id}</td>
-                  <td>{getStatusBadge(prediction.status)}</td>
+                  <td><StatusBadge status={prediction.status} /></td>
                   <td>
                     {prediction.corpus
                       ? (prediction.corpus.length > 50 ? `${prediction.corpus.substring(0, 50)}...` : prediction.corpus)
@@ -72,9 +56,13 @@ export const PredictionsListPage: FC = () => {
                     }
                   </td>
                   <td>
-                    <Link to={`${ROUTES.PREDICTION}/${prediction.id}`} className="btn btn-sm btn-outline-primary">
-                      Просмотр
-                    </Link>
+                    {prediction.id ? (
+                      <Link to={`${ROUTES.PREDICTION}/${prediction.id}`} className="small-action-button">
+                        Просмотр
+                      </Link>
+                    ) : (
+                      <span className="text-muted">ID не найден</span>
+                    )}
                   </td>
                 </tr>
               ))

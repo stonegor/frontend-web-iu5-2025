@@ -142,6 +142,9 @@ const predictionsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(getPrediction.pending, (state) => {
+                state.error = null;
+            })
             .addCase(getPrediction.fulfilled, (state, action) => {
                 const data = action.payload as any;
                 state.authors = data.authors || [];
@@ -153,6 +156,9 @@ const predictionsSlice = createSlice({
             })
             .addCase(getPrediction.rejected, (state, action) => {
                 state.error = action.payload as string;
+            })
+            .addCase(getPredictionsList.pending, (state) => {
+                state.error = null;
             })
             .addCase(getPredictionsList.fulfilled, (state, action) => {
                 state.predictionsList = action.payload;

@@ -457,6 +457,33 @@ h3 {
 
 }
 
+.small-action-button {
+    background-color: #202022;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 0.3rem 0.8rem;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.small-action-button:hover {
+    background-color: #333;
+    color: white;
+}
+
+.custom-badge {
+    border-radius: 25px !important;
+    font-size: 0.75em !important;
+    padding: 0.5em 0.8em !important;
+    font-weight: 600;
+}
 
 
 /* --- USA Card Component Styles --- */

@@ -57,6 +57,8 @@ export interface PredictionCandidate {
 }
 
 export interface AuthorPrediction {
+  /** ID */
+  id?: number;
   /** Status */
   status?: "DRAFT" | "DELETED" | "FORMED" | "COMPLETED" | "REJECTED";
   /**
