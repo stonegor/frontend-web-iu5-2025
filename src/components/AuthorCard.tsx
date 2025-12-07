@@ -1,6 +1,6 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
-import { type Author } from "../api/types";
+import { type Author } from "../api/Api";
 import { Plus } from "lucide-react";
 import defaultAuthor from "/AuthorPlaceholder.png";
 import { showPrediction } from "../config";

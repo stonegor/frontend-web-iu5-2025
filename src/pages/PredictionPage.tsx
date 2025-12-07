@@ -1,14 +1,19 @@
-import { type FC } from "react";
+import { type FC, useEffect } from "react";
 import { UserSearch } from "lucide-react";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS } from "../routes";
 import defaultAuthor from "/AuthorPlaceholder.png";
-import { GetData } from "../getData";
-import { useAuthors } from "../slices/authorsSlice";
+import { useAuthors, getAuthorsList } from "../slices/authorsSlice";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../store";
 
 export const PredictionPage: FC = () => {
-  GetData();
+  const dispatch = useDispatch<AppDispatch>();
   const authors = useAuthors();
+
+  useEffect(() => {
+    dispatch(getAuthorsList());
+  }, [dispatch]);
 
   return (
     <div className="prediction-detail-container">
@@ -29,8 +34,8 @@ export const PredictionPage: FC = () => {
 
       <h2 className="authors-list-header">Результаты</h2>
       <div className="results-cards">
-        {authors.map((author) => (
-          <div className="card" key={author.id}>
+        {authors.map((author, index) => (
+          <div className="card" key={author.id || index}>
             <div className="card-image-container">
               <img
                 src={author.image_url || defaultAuthor}
@@ -48,8 +53,8 @@ export const PredictionPage: FC = () => {
                   {author.count_ili}, либо: {author.count_libo}
                 </p>
                 <div className="dropdown">
-                  <label htmlFor={`period-${author.id}`}>Период:</label>
-                  <select name="period" id={`period-${author.id}`}>
+                  <label htmlFor={`period-${author.id || index}`}>Период:</label>
+                  <select name="period" id={`period-${author.id || index}`}>
                     <option value="early">Ранний</option>
                     <option value="mature">Зрелый</option>
                     <option value="late">Поздний</option>

@@ -1,4 +1,4 @@
-import type { Author } from "./types";
+import type { Author } from "./Api";
 import defaultAuthor from "/AuthorPlaceholder.png";
 
 export const AUTHORS_MOCK: Author[] = [

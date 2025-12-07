@@ -1,8 +1,8 @@
 import { type FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { User } from "lucide-react";
-import { getAuthorById } from "../api/authors";
-import { type Author } from "../api/types";
+import { api } from "../api";
+import { type Author } from "../api/Api";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTES, ROUTE_LABELS } from "../routes";
 import defaultAuthor from "/AuthorPlaceholder.png";
@@ -15,13 +15,13 @@ export const AuthorDetailPage: FC = () => {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      getAuthorById(Number(id))
-        .then((authorData) => {
-          if (authorData) {
-            setAuthor(authorData);
-          } else {
-            setAuthor(null);
-          }
+      api.authors.authorsRead(id)
+        .then((response) => {
+          setAuthor(response.data);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch author", error);
+          setAuthor(null);
         })
         .finally(() => {
           setLoading(false);
@@ -42,7 +42,7 @@ export const AuthorDetailPage: FC = () => {
       <Breadcrumbs
         crumbs={[
           { label: ROUTE_LABELS.AUTHORS, path: ROUTES.AUTHORS },
-          { label: author.name },
+          { label: author.name || "Автор" },
         ]}
       />
       <h1 className="page-title">

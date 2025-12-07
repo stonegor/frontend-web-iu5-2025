@@ -1,17 +1,21 @@
 import { type FC, useEffect, useState } from "react";
 import Carousel from "react-bootstrap/Carousel";
-import { type Author } from "../api/types";
-import { GetData } from "../getData";
-import { useAuthors } from "../slices/authorsSlice";
+import { type Author } from "../api/Api";
+import { useAuthors, getAuthorsList } from "../slices/authorsSlice";
 import defaultAuthor from "/AuthorPlaceholder.png";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../store";
 
 export const HomePage: FC = () => {
-  // Fetch data into Redux store
-  GetData();
+  const dispatch = useDispatch<AppDispatch>();
   
   // Select data from Redux store
   const allAuthors = useAuthors();
   const [displayedAuthors, setDisplayedAuthors] = useState<Author[]>([]);
+
+  useEffect(() => {
+    dispatch(getAuthorsList());
+  }, [dispatch]);
 
   // Update local displayed state when authors change
   useEffect(() => {
@@ -41,7 +45,7 @@ export const HomePage: FC = () => {
               <Carousel.Item key={author.id}>
                 <img
                   className="d-block w-100"
-                  src={author.image_url}
+                  src={author.image_url || defaultAuthor}
                   alt={author.name}
                   onError={(e) => {
                     e.currentTarget.src = defaultAuthor;
