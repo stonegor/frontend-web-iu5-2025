@@ -552,7 +552,7 @@ h3 {
 .results-cards .dropdown {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 
 .results-cards .dropdown label {
@@ -609,6 +609,8 @@ h3 {
 
 .results-cards .card-details {
     margin-top: 2px;
+    gap: 5px;
+    white-space: nowrap;
 }
 
 .results-cards .card-stats {
