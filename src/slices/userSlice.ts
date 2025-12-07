@@ -41,6 +41,35 @@ export const logoutUserAsync = createAsyncThunk(
   }
 );
 
+// Async action for registration
+export const registerUserAsync = createAsyncThunk(
+  'user/registerUserAsync',
+  async (userData: Login, { rejectWithValue }) => {
+    try {
+      await api.users.usersRegisterCreate(userData);
+      // Automatically login after registration or just return success?
+      // Usually require login separate, but let's see. 
+      // For now just return success.
+      return; 
+    } catch (error) {
+      return rejectWithValue('Ошибка при регистрации');
+    }
+  }
+);
+
+// Async action for updating profile
+export const updateUserProfileAsync = createAsyncThunk(
+  'user/updateUserProfileAsync',
+  async (userData: Login, { rejectWithValue }) => {
+    try {
+      const response = await api.users.usersProfileUpdate(userData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Ошибка при обновлении профиля');
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -67,6 +96,19 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(logoutUserAsync.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      .addCase(registerUserAsync.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      .addCase(updateUserProfileAsync.fulfilled, (state, action) => {
+        const { email } = action.payload;
+        state.username = email;
+        state.error = null;
+      })
+      .addCase(updateUserProfileAsync.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

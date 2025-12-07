@@ -1,28 +1,43 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../api';
-import type { PredictionCandidate, AuthorPredictionUpdate } from '../api/Api';
+import type { PredictionCandidate, AuthorPredictionUpdate, AuthorPrediction } from '../api/Api';
+import { logoutUserAsync } from './userSlice';
 
 interface PredictionsState {
-  prediction_id: number;
-  count: number;
-  
-  authors: PredictionCandidate[];
-  predictionData: {
-      corpus?: string;
-      status?: "DRAFT" | "DELETED" | "FORMED" | "COMPLETED" | "REJECTED";
-  };
-  isDraft: boolean;
-  error: string | null;
+    prediction_id: number;
+    count: number;
+
+    authors: PredictionCandidate[];
+    predictionData: {
+        corpus?: string;
+        status?: "DRAFT" | "DELETED" | "FORMED" | "COMPLETED" | "REJECTED";
+    };
+    predictionsList: AuthorPrediction[];
+    isDraft: boolean;
+    error: string | null;
 }
 
 const initialState: PredictionsState = {
-  prediction_id: NaN,
-  count: NaN,
-  authors: [],
-  predictionData: {},
-  isDraft: false,
-  error: null,
+    prediction_id: NaN,
+    count: NaN,
+    authors: [],
+    predictionData: {},
+    predictionsList: [],
+    isDraft: false,
+    error: null,
 };
+
+export const getPredictionsList = createAsyncThunk(
+    'predictions/getPredictionsList',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.authorPredictions.authorPredictionsList();
+            return response.data;
+        } catch (error) {
+            return rejectWithValue('Ошибка при загрузке списка предсказаний');
+        }
+    }
+);
 
 export const getPrediction = createAsyncThunk(
     'predictions/getPrediction',
@@ -84,6 +99,30 @@ export const deleteAuthorFromPrediction = createAsyncThunk(
     }
 );
 
+export const updateAuthorStage = createAsyncThunk(
+    'predictions/updateAuthorStage',
+    async ({ predictionId, authorId, stage }: { predictionId: string; authorId: string; stage: string }, { rejectWithValue }) => {
+        try {
+            const response = await api.authorPredictions.authorPredictionsAuthorStageUpdate(predictionId, authorId, { stage });
+            return { authorId, stage: response.data.stage };
+        } catch (error) {
+            return rejectWithValue('Ошибка при обновлении стадии');
+        }
+    }
+);
+
+export const submitPrediction = createAsyncThunk(
+    'predictions/submitPrediction',
+    async (id: string, { rejectWithValue }) => {
+        try {
+            await api.authorPredictions.authorPredictionsSubmitUpdate(id);
+            return id;
+        } catch (error) {
+            return rejectWithValue('Ошибка при подтверждении предсказания');
+        }
+    }
+);
+
 const predictionsSlice = createSlice({
     name: 'predictions',
     initialState,
@@ -104,7 +143,7 @@ const predictionsSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(getPrediction.fulfilled, (state, action) => {
-                const data = action.payload as any; 
+                const data = action.payload as any;
                 state.authors = data.authors || [];
                 state.predictionData = { corpus: data.corpus, status: data.status };
                 state.isDraft = data.status === 'DRAFT';
@@ -113,6 +152,12 @@ const predictionsSlice = createSlice({
                 }
             })
             .addCase(getPrediction.rejected, (state, action) => {
+                state.error = action.payload as string;
+            })
+            .addCase(getPredictionsList.fulfilled, (state, action) => {
+                state.predictionsList = action.payload;
+            })
+            .addCase(getPredictionsList.rejected, (state, action) => {
                 state.error = action.payload as string;
             })
             .addCase(addAuthorToPrediction.fulfilled, (state, action) => {
@@ -132,11 +177,33 @@ const predictionsSlice = createSlice({
                 state.isDraft = false;
             })
             .addCase(updatePrediction.fulfilled, (state, action) => {
-                 state.predictionData.corpus = action.payload.corpus;
+                state.predictionData.corpus = action.payload.corpus;
             })
             .addCase(deleteAuthorFromPrediction.fulfilled, (state, action) => {
-                 state.authors = state.authors.filter(a => String((a.author as any)?.id) !== action.payload); 
-                 state.count = state.authors.length;
+                state.authors = state.authors.filter(a => String((a.author as any)?.id) !== action.payload);
+                state.count = state.authors.length;
+            })
+            .addCase(updateAuthorStage.fulfilled, (state, action) => {
+                const author = state.authors.find(a => String((a.author as any)?.id) === action.payload.authorId);
+                if (author) {
+                    author.stage = action.payload.stage as any;
+                }
+            })
+            .addCase(submitPrediction.fulfilled, (state) => {
+                state.isDraft = false;
+                state.predictionData.status = "FORMED"; // Assuming it goes to FORMED or similar
+                // Clear draft info from state as it's no longer a draft
+                state.prediction_id = NaN;
+                state.count = NaN;
+            })
+            .addCase(logoutUserAsync.fulfilled, (state) => {
+                state.prediction_id = NaN;
+                state.count = NaN;
+                state.authors = [];
+                state.predictionData = {};
+                state.predictionsList = [];
+                state.isDraft = false;
+                state.error = null;
             });
     }
 });

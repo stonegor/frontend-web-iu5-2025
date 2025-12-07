@@ -2,7 +2,7 @@ import { type FC, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { getPrediction, deletePrediction, updatePrediction } from "../slices/predictionsSlice";
+import { getPrediction, deletePrediction, updatePrediction, submitPrediction } from "../slices/predictionsSlice";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS, ROUTES } from "../routes";
 import { UserSearch } from "lucide-react";
@@ -43,12 +43,13 @@ export const PredictionPage: FC = () => {
       await dispatch(updatePrediction({ id, data: { corpus } }));
     }
   };
-
-  // Debounced save or manual save? The original template didn't have a save button for text, 
-  // but let's assume blur or manual save.
-  // The walkthrough has a "Save" button for vacancy fields.
-  // I will add a save button if it's draft, or just save on blur.
-  // For now, let's just update state.
+  
+  const handleSubmitPrediction = async () => {
+      if (id) {
+          await dispatch(submitPrediction(id));
+          navigate(ROUTES.PREDICTIONS); // Redirect to list after submit
+      }
+  };
 
   if (!id) return <div>No ID provided</div>;
 
@@ -59,6 +60,13 @@ export const PredictionPage: FC = () => {
         <UserSearch strokeWidth={3} />
         <span>Поиск Автора по тексту</span>
       </h1>
+      
+      {/* Show status if not draft */}
+      {!isDraft && predictionData.status && (
+          <div className="alert alert-info">
+              Статус: {predictionData.status}
+          </div>
+      )}
 
       <div className="search-and-summary">
         <form className="search-form prediction-form">
@@ -92,11 +100,14 @@ export const PredictionPage: FC = () => {
       </div>
 
       {isDraft && (
-        <form onSubmit={handleDelete} className="d-flex justify-content-end mt-3">
-          <button type="submit" className="delete-button">
-            Удалить
-          </button>
-        </form>
+        <div className="d-flex justify-content-between mt-3">
+            <button className="action-button" onClick={handleDelete}>
+                Удалить
+            </button>
+            <button className="action-button" onClick={handleSubmitPrediction}>
+                Подтвердить
+            </button>
+        </div>
       )}
     </div>
   );

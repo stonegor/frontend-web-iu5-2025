@@ -4,6 +4,7 @@ import { api } from "../api";
 import type { Author } from "../api/Api";
 import { AUTHORS_MOCK } from "../api/mock";
 import { setPredictionId, setCount } from "./predictionsSlice";
+import { logoutUserAsync } from "./userSlice";
 
 interface AuthorsState {
     authors: Author[];
@@ -76,6 +77,9 @@ const authorsSlice = createSlice({
                 state.authors = AUTHORS_MOCK.filter((item) =>
                     item.name?.toLowerCase().includes(state.filterValue.toLowerCase())
                 );
+            })
+            .addCase(logoutUserAsync.fulfilled, (state) => {
+                state.filterValue = '';
             });
     },
 });

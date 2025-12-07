@@ -2,11 +2,11 @@ import React, { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Form, Alert, Container } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../store';
-import { loginUserAsync } from '../slices/userSlice';
+import { registerUserAsync } from '../slices/userSlice';
 import { useNavigate, Link } from "react-router-dom";
 import { ROUTES } from '../routes';
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
@@ -20,16 +20,17 @@ const LoginPage: React.FC = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (formData.email && formData.password) {
-            const result = await dispatch(loginUserAsync(formData));
-            if (loginUserAsync.fulfilled.match(result)) {
-                navigate(ROUTES.AUTHORS);
+            const result = await dispatch(registerUserAsync(formData));
+            if (registerUserAsync.fulfilled.match(result)) {
+                // Redirect to login page after successful registration
+                navigate(ROUTES.LOGIN);
             }
         }
     };
 
     return (
         <Container style={{ maxWidth: '400px', marginTop: '150px' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Рады снова Вас видеть!</h2>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Регистрация</h2>
             {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="email" style={{ marginBottom: '15px' }}>
@@ -53,14 +54,14 @@ const LoginPage: React.FC = () => {
                     />
                 </Form.Group>
                 <button className="action-button" type="submit" style={{ width: '100%' }}>
-                    Войти
+                    Зарегистрироваться
                 </button>
             </Form>
             <div className="mt-3 text-center">
-                Нет аккаунта? <Link to={ROUTES.REGISTER}>Зарегистрироваться</Link>
+                Уже есть аккаунт? <Link to={ROUTES.LOGIN}>Войти</Link>
             </div>
         </Container>
     );
 };
 
-export default LoginPage;
+export default RegisterPage;

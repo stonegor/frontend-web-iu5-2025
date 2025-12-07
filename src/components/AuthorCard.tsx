@@ -5,7 +5,7 @@ import { Plus, X } from "lucide-react";
 import defaultAuthor from "/AuthorPlaceholder.png";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { addAuthorToPrediction, deleteAuthorFromPrediction } from "../slices/predictionsSlice";
+import { addAuthorToPrediction, deleteAuthorFromPrediction, updateAuthorStage } from "../slices/predictionsSlice";
 import { getAuthorsList } from "../slices/authorsSlice";
 import { Button } from "react-bootstrap";
 import { ROUTES } from "../routes";
@@ -40,6 +40,12 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
     }
   };
 
+  const handleStageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (author.id && predictionId) {
+       await dispatch(updateAuthorStage({ predictionId: String(predictionId), authorId: String(author.id), stage: e.target.value }));
+    }
+  };
+
   // Prediction Page View (Matches original template structure)
   if (isPredictionPage) {
     return (
@@ -66,6 +72,7 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
                 name="period"
                 id={`period-${author.id}`}
                 defaultValue={stage?.toLowerCase() || "early"}
+                onChange={handleStageChange}
                 disabled={!isDraft}
               >
                 <option value="early">Ранний</option>

@@ -74,6 +74,7 @@ h3 {
 .search-form {
     flex-grow: 1;
     position: relative;
+    margin-bottom: 30px;
 }
 
 .search-form .search-icon-btn {
@@ -389,20 +390,72 @@ h3 {
 }
 
 .delete-button {
+
     background-color: #202022;
+
     color: white;
+
     border: none;
+
     border-radius: 25px;
+
     padding: 0.5rem 1rem;
+
     cursor: pointer;
+
     font-family: "Inter", sans-serif;
+
     font-weight: 600;
+
     font-size: 1rem;
+
     align-self: flex-end;
+
     margin-top: 1rem;
+
 }
 
 
+
+.action-button {
+
+    background-color: #202022;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 25px;
+
+    padding: 0.5rem 1rem;
+
+    cursor: pointer;
+
+    font-family: "Inter", sans-serif;
+
+    font-weight: 600;
+
+    font-size: 1rem;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+}
+
+
+
+.action-button:hover {
+
+    background-color: #333;
+
+    color: white;
+
+}
 
 
 
