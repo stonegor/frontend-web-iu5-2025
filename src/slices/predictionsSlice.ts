@@ -29,9 +29,9 @@ const initialState: PredictionsState = {
 
 export const getPredictionsList = createAsyncThunk(
     'predictions/getPredictionsList',
-    async (_, { rejectWithValue }) => {
+    async (params: { status?: string, start_date?: string, end_date?: string } | undefined, { rejectWithValue }) => {
         try {
-            const response = await api.authorPredictions.authorPredictionsList();
+            const response = await api.authorPredictions.authorPredictionsList(params);
             return response.data;
         } catch (error) {
             return rejectWithValue('Ошибка при загрузке списка предсказаний');
@@ -123,6 +123,18 @@ export const submitPrediction = createAsyncThunk(
     }
 );
 
+export const completePrediction = createAsyncThunk(
+    'predictions/completePrediction',
+    async ({ id, action }: { id: string, action: 'complete' | 'reject' }, { rejectWithValue }) => {
+        try {
+            const response = await api.authorPredictions.authorPredictionsCompleteUpdate(id, { action });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue('Ошибка при изменении статуса предсказания');
+        }
+    }
+);
+
 const predictionsSlice = createSlice({
     name: 'predictions',
     initialState,
@@ -201,6 +213,14 @@ const predictionsSlice = createSlice({
                 // Clear draft info from state as it's no longer a draft
                 state.prediction_id = NaN;
                 state.count = NaN;
+            })
+            .addCase(completePrediction.fulfilled, (state, action) => {
+                 // Update the specific prediction in the list
+                 const updated = action.payload.data;
+                 const index = state.predictionsList.findIndex(p => p.id === updated.id);
+                 if (index !== -1) {
+                     state.predictionsList[index] = updated;
+                 }
             })
             .addCase(logoutUserAsync.fulfilled, (state) => {
                 state.prediction_id = NaN;

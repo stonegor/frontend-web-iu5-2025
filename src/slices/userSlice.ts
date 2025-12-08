@@ -5,12 +5,14 @@ import type { Login } from '../api/Api';
 interface UserState {
   username: string;
   isAuthenticated: boolean;
+  isStaff: boolean;
   error?: string | null;
 }
 
 const initialState: UserState = {
   username: '',
   isAuthenticated: false,
+  isStaff: false,
   error: null,
 };
 
@@ -48,9 +50,9 @@ export const registerUserAsync = createAsyncThunk(
     try {
       await api.users.usersRegisterCreate(userData);
       // Automatically login after registration or just return success?
-      // Usually require login separate, but let's see. 
+      // Usually require login separate, but let's see.
       // For now just return success.
-      return; 
+      return;
     } catch (error) {
       return rejectWithValue('Ошибка при регистрации');
     }
@@ -80,19 +82,22 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUserAsync.fulfilled, (state, action) => {
-        const { email } = action.payload; // user profile has email
+        const { email, is_staff } = action.payload; // user profile has email and is_staff
         state.username = email;
+        state.isStaff = is_staff || false;
         state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(loginUserAsync.rejected, (state, action) => {
         state.error = action.payload as string;
         state.isAuthenticated = false;
+        state.isStaff = false;
       })
 
       .addCase(logoutUserAsync.fulfilled, (state) => {
         state.username = '';
         state.isAuthenticated = false;
+        state.isStaff = false;
         state.error = null;
       })
       .addCase(logoutUserAsync.rejected, (state, action) => {
@@ -113,6 +118,5 @@ const userSlice = createSlice({
       });
   },
 });
-
 export const {} = userSlice.actions;
 export default userSlice.reducer;

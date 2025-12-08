@@ -67,6 +67,8 @@ export interface AuthorPrediction {
    */
   corpus?: string;
   authors?: PredictionCandidate[];
+  calculated_candidates_count?: number;
+  client_email?: string;
 }
 
 export interface AuthorPredictionUpdate {
@@ -146,6 +148,7 @@ export interface User {
    * @maxLength 128
    */
   password: string;
+  is_staff?: boolean;
 }
 
 import type {
