@@ -5,7 +5,7 @@ import { Plus, X, Save } from "lucide-react";
 import defaultAuthor from "/AuthorPlaceholder.png";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { addAuthorToPrediction, deleteAuthorFromPrediction, updateAuthorStage } from "../slices/predictionsSlice";
+import { addAuthorToPrediction } from "../slices/predictionsSlice";
 import { getAuthorsList } from "../slices/authorsSlice";
 import { Button } from "react-bootstrap";
 import { ROUTES } from "../routes";
@@ -16,9 +16,19 @@ interface AuthorCardProps {
   isDraft?: boolean;
   stage?: string;
   probability?: number;
+  onDeleteAuthor?: () => Promise<void>;
+  onUpdateStage?: (stage: string) => Promise<void>;
 }
 
-export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft, stage, probability }) => {
+export const AuthorCard: FC<AuthorCardProps> = ({ 
+  author, 
+  predictionId, 
+  isDraft, 
+  stage, 
+  probability,
+  onDeleteAuthor,
+  onUpdateStage
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
@@ -41,8 +51,8 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (author.id && predictionId) {
-      await dispatch(deleteAuthorFromPrediction({ predictionId: String(predictionId), authorId: String(author.id) }));
+    if (onDeleteAuthor) {
+      await onDeleteAuthor();
     }
   };
 
@@ -51,8 +61,8 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
   };
 
   const handleSaveStage = async () => {
-    if (author.id && predictionId) {
-      await dispatch(updateAuthorStage({ predictionId: String(predictionId), authorId: String(author.id), stage: currentStage }));
+    if (onUpdateStage) {
+      await onUpdateStage(currentStage);
     }
   };
 

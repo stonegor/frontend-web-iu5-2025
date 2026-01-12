@@ -4,28 +4,37 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTES, ROUTE_LABELS } from "../routes";
-import { getPredictionsList, completePrediction } from "../slices/predictionsSlice";
+import { setPredictionsList, updatePredictionStatusInList, setError } from "../slices/predictionsSlice";
 import type { AppDispatch, RootState } from "../store";
 import { FileText, Check, X } from "lucide-react";
 import { StatusBadge } from "../components/StatusBadge";
+import { api } from "../api";
 
 export const PredictionsListPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { predictionsList, error } = useSelector((state: RootState) => state.predictions);
   const { isStaff } = useSelector((state: RootState) => state.user);
-  const loading = false; 
+  const [loading, setLoading] = useState(false);
 
   const [statusFilter, setStatusFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [creatorFilter, setCreatorFilter] = useState("");
 
-  const fetchPredictions = () => {
-    dispatch(getPredictionsList({
-      status: statusFilter || undefined,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined
-    }));
+  const fetchPredictions = async () => {
+    if (predictionsList.length === 0) setLoading(true);
+    try {
+      const response = await api.authorPredictions.authorPredictionsList({
+        status: statusFilter || undefined,
+        start_date: startDate || undefined,
+        end_date: endDate || undefined
+      });
+      dispatch(setPredictionsList(response.data));
+    } catch (err) {
+      dispatch(setError("Ошибка при загрузке списка предсказаний"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -34,13 +43,19 @@ export const PredictionsListPage: FC = () => {
     return () => clearInterval(interval);
   }, [dispatch, statusFilter, startDate, endDate]);
 
-  const handleAction = (id: number, action: 'complete' | 'reject') => {
-      dispatch(completePrediction({ id: String(id), action }));
+  const handleAction = async (id: number, action: 'complete' | 'reject') => {
+    try {
+      await api.authorPredictions.authorPredictionsCompleteUpdate(String(id), { action });
+      const newStatus = action === 'complete' ? 'COMPLETED' : 'REJECTED';
+      dispatch(updatePredictionStatusInList({ id, status: newStatus }));
+    } catch (err) {
+      dispatch(setError("Ошибка при изменении статуса предсказания"));
+    }
   };
 
   const displayedPredictions = predictionsList.filter(p => {
-      if (!creatorFilter) return true;
-      return p.client_email?.toLowerCase().includes(creatorFilter.toLowerCase());
+    if (!creatorFilter) return true;
+    return p.client_email?.toLowerCase().includes(creatorFilter.toLowerCase());
   });
 
   return (
@@ -54,48 +69,48 @@ export const PredictionsListPage: FC = () => {
 
       {/* Filters */}
       <div className="card p-3 mb-4">
-          <Row className="g-3">
-              <Col md={3}>
-                  <Form.Group>
-                      <Form.Label>Статус</Form.Label>
-                      <Form.Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                          <option value="">Все</option>
-                          <option value="DRAFT">Черновик</option>
-                          <option value="FORMED">Сформирован</option>
-                          <option value="COMPLETED">Завершен</option>
-                          <option value="REJECTED">Отклонен</option>
-                      </Form.Select>
-                  </Form.Group>
-              </Col>
-              <Col md={3}>
-                  <Form.Group>
-                      <Form.Label>Дата начала</Form.Label>
-                      <Form.Control type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                  </Form.Group>
-              </Col>
-              <Col md={3}>
-                  <Form.Group>
-                      <Form.Label>Дата окончания</Form.Label>
-                      <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                  </Form.Group>
-              </Col>
-               <Col md={3}>
-                  <Form.Group>
-                      <Form.Label>Email создателя</Form.Label>
-                      <Form.Control 
-                        type="text" 
-                        placeholder="Фильтр по email" 
-                        value={creatorFilter} 
-                        onChange={(e) => setCreatorFilter(e.target.value)} 
-                      />
-                  </Form.Group>
-              </Col>
-          </Row>
+        <Row className="g-3">
+          <Col md={3}>
+            <Form.Group>
+              <Form.Label>Статус</Form.Label>
+              <Form.Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="">Все</option>
+                <option value="DRAFT">Черновик</option>
+                <option value="FORMED">Сформирован</option>
+                <option value="COMPLETED">Завершен</option>
+                <option value="REJECTED">Отклонен</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={3}>
+            <Form.Group>
+              <Form.Label>Дата начала</Form.Label>
+              <Form.Control type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            </Form.Group>
+          </Col>
+          <Col md={3}>
+            <Form.Group>
+              <Form.Label>Дата окончания</Form.Label>
+              <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            </Form.Group>
+          </Col>
+          <Col md={3}>
+            <Form.Group>
+              <Form.Label>Email создателя</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Фильтр по email"
+                value={creatorFilter}
+                onChange={(e) => setCreatorFilter(e.target.value)}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {loading ? (
+      {loading && predictionsList.length === 0 ? (
         <div className="d-flex justify-content-center">
           <Spinner animation="border" />
         </div>
@@ -127,32 +142,32 @@ export const PredictionsListPage: FC = () => {
                   </td>
                   <td>
                     <div className="d-flex gap-2">
-                        {prediction.id ? (
+                      {prediction.id ? (
                         <Link to={`${ROUTES.PREDICTION}/${prediction.id}`} className="small-action-button">
-                            Просмотр
+                          Просмотр
                         </Link>
-                        ) : null}
-                        
-                        {isStaff && prediction.status === 'FORMED' && prediction.id && (
-                            <>
-                                <Button 
-                                    variant="success" 
-                                    size="sm" 
-                                    onClick={() => handleAction(prediction.id!, 'complete')}
-                                    title="Завершить"
-                                >
-                                    <Check size={16} />
-                                </Button>
-                                <Button 
-                                    variant="danger" 
-                                    size="sm" 
-                                    onClick={() => handleAction(prediction.id!, 'reject')}
-                                    title="Отклонить"
-                                >
-                                    <X size={16} />
-                                </Button>
-                            </>
-                        )}
+                      ) : null}
+
+                      {isStaff && prediction.status === 'FORMED' && prediction.id && (
+                        <>
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={() => handleAction(prediction.id!, 'complete')}
+                            title="Завершить"
+                          >
+                            <Check size={16} />
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleAction(prediction.id!, 'reject')}
+                            title="Отклонить"
+                          >
+                            <X size={16} />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

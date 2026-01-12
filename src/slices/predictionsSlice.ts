@@ -27,30 +27,7 @@ const initialState: PredictionsState = {
     error: null,
 };
 
-export const getPredictionsList = createAsyncThunk(
-    'predictions/getPredictionsList',
-    async (params: { status?: string, start_date?: string, end_date?: string } | undefined, { rejectWithValue }) => {
-        try {
-            const response = await api.authorPredictions.authorPredictionsList(params);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue('Ошибка при загрузке списка предсказаний');
-        }
-    }
-);
-
-export const getPrediction = createAsyncThunk(
-    'predictions/getPrediction',
-    async (id: string, { rejectWithValue }) => {
-        try {
-            const response = await api.authorPredictions.authorPredictionsRead(id);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue('Ошибка при загрузке предсказания');
-        }
-    }
-);
-
+// Keep this one as it might be used by AuthorsPage/AuthorCard in list view
 export const addAuthorToPrediction = createAsyncThunk(
     'predictions/addAuthorToPrediction',
     async (authorId: number, { rejectWithValue }) => {
@@ -59,78 +36,6 @@ export const addAuthorToPrediction = createAsyncThunk(
             return response.data;
         } catch (error) {
             return rejectWithValue('Ошибка при добавлении автора');
-        }
-    }
-);
-
-export const deletePrediction = createAsyncThunk(
-    'predictions/deletePrediction',
-    async (id: string, { rejectWithValue }) => {
-        try {
-            await api.authorPredictions.authorPredictionsDelete(id);
-            return id;
-        } catch (error) {
-            return rejectWithValue('Ошибка при удалении предсказания');
-        }
-    }
-);
-
-export const updatePrediction = createAsyncThunk(
-    'predictions/updatePrediction',
-    async ({ id, data }: { id: string; data: AuthorPredictionUpdate }, { rejectWithValue }) => {
-        try {
-            const response = await api.authorPredictions.authorPredictionsUpdate(id, data);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue('Ошибка при обновлении предсказания');
-        }
-    }
-);
-
-export const deleteAuthorFromPrediction = createAsyncThunk(
-    'predictions/deleteAuthorFromPrediction',
-    async ({ predictionId, authorId }: { predictionId: string; authorId: string }, { rejectWithValue }) => {
-        try {
-            await api.authorPredictions.authorPredictionsAuthorDelete(predictionId, authorId);
-            return authorId;
-        } catch (error) {
-            return rejectWithValue('Ошибка при удалении автора из предсказания');
-        }
-    }
-);
-
-export const updateAuthorStage = createAsyncThunk(
-    'predictions/updateAuthorStage',
-    async ({ predictionId, authorId, stage }: { predictionId: string; authorId: string; stage: string }, { rejectWithValue }) => {
-        try {
-            const response = await api.authorPredictions.authorPredictionsAuthorStageUpdate(predictionId, authorId, { stage });
-            return { authorId, stage: response.data.stage };
-        } catch (error) {
-            return rejectWithValue('Ошибка при обновлении стадии');
-        }
-    }
-);
-
-export const submitPrediction = createAsyncThunk(
-    'predictions/submitPrediction',
-    async (id: string, { rejectWithValue }) => {
-        try {
-            await api.authorPredictions.authorPredictionsSubmitUpdate(id);
-            return id;
-        } catch (error) {
-            return rejectWithValue('Ошибка при подтверждении предсказания');
-        }
-    }
-);
-
-export const completePrediction = createAsyncThunk(
-    'predictions/completePrediction',
-    async ({ id, action }: { id: string, action: 'complete' | 'reject' }, { rejectWithValue }) => {
-        try {
-            const response = await api.authorPredictions.authorPredictionsCompleteUpdate(id, { action });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue('Ошибка при изменении статуса предсказания');
         }
     }
 );
@@ -151,33 +56,58 @@ const predictionsSlice = createSlice({
         setPredictionData: (state, action: PayloadAction<AuthorPredictionUpdate>) => {
             state.predictionData = { ...state.predictionData, ...action.payload };
         },
+        setPredictionsList: (state, action: PayloadAction<AuthorPrediction[]>) => {
+            state.predictionsList = action.payload;
+        },
+        setPredictionDetails: (state, action: PayloadAction<any>) => {
+            const data = action.payload;
+            state.authors = data.authors || [];
+            state.predictionData = { corpus: data.corpus, status: data.status };
+            state.isDraft = data.status === 'DRAFT';
+            if (data.id) {
+                state.prediction_id = data.id;
+            }
+        },
+        removeAuthorFromState: (state, action: PayloadAction<string>) => {
+            state.authors = state.authors.filter(a => String((a.author as any)?.id) !== action.payload);
+            state.count = state.authors.length;
+        },
+        updateAuthorStageInState: (state, action: PayloadAction<{ authorId: string, stage: string }>) => {
+            const author = state.authors.find(a => String((a.author as any)?.id) === action.payload.authorId);
+            if (author) {
+                author.stage = action.payload.stage as any;
+            }
+        },
+        updatePredictionStatusInState: (state) => {
+            state.isDraft = false;
+            state.predictionData.status = "FORMED";
+            state.prediction_id = NaN;
+            state.count = NaN;
+        },
+        updatePredictionInList: (state, action: PayloadAction<AuthorPrediction>) => {
+            const updated = action.payload;
+            const index = state.predictionsList.findIndex(p => p.id === updated.id);
+            if (index !== -1) {
+                state.predictionsList[index] = updated;
+            }
+        },
+        updatePredictionStatusInList: (state, action: PayloadAction<{ id: number, status: string }>) => {
+            const { id, status } = action.payload;
+            const index = state.predictionsList.findIndex(p => p.id === id);
+            if (index !== -1) {
+                state.predictionsList[index].status = status as any;
+            }
+        },
+        resetPredictionState: (state) => {
+            state.prediction_id = NaN;
+            state.count = NaN;
+            state.authors = [];
+            state.predictionData = {};
+            state.isDraft = false;
+        }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getPrediction.pending, (state) => {
-                state.error = null;
-            })
-            .addCase(getPrediction.fulfilled, (state, action) => {
-                const data = action.payload as any;
-                state.authors = data.authors || [];
-                state.predictionData = { corpus: data.corpus, status: data.status };
-                state.isDraft = data.status === 'DRAFT';
-                if (data.id) {
-                    state.prediction_id = data.id;
-                }
-            })
-            .addCase(getPrediction.rejected, (state, action) => {
-                state.error = action.payload as string;
-            })
-            .addCase(getPredictionsList.pending, (state) => {
-                state.error = null;
-            })
-            .addCase(getPredictionsList.fulfilled, (state, action) => {
-                state.predictionsList = action.payload;
-            })
-            .addCase(getPredictionsList.rejected, (state, action) => {
-                state.error = action.payload as string;
-            })
             .addCase(addAuthorToPrediction.fulfilled, (state, action) => {
                 const data = action.payload as any;
                 if (data.id) {
@@ -186,41 +116,6 @@ const predictionsSlice = createSlice({
                 if (data.authors) {
                     state.count = data.authors.length;
                 }
-            })
-            .addCase(deletePrediction.fulfilled, (state) => {
-                state.prediction_id = NaN;
-                state.count = NaN;
-                state.authors = [];
-                state.predictionData = {};
-                state.isDraft = false;
-            })
-            .addCase(updatePrediction.fulfilled, (state, action) => {
-                state.predictionData.corpus = action.payload.corpus;
-            })
-            .addCase(deleteAuthorFromPrediction.fulfilled, (state, action) => {
-                state.authors = state.authors.filter(a => String((a.author as any)?.id) !== action.payload);
-                state.count = state.authors.length;
-            })
-            .addCase(updateAuthorStage.fulfilled, (state, action) => {
-                const author = state.authors.find(a => String((a.author as any)?.id) === action.payload.authorId);
-                if (author) {
-                    author.stage = action.payload.stage as any;
-                }
-            })
-            .addCase(submitPrediction.fulfilled, (state) => {
-                state.isDraft = false;
-                state.predictionData.status = "FORMED"; // Assuming it goes to FORMED or similar
-                // Clear draft info from state as it's no longer a draft
-                state.prediction_id = NaN;
-                state.count = NaN;
-            })
-            .addCase(completePrediction.fulfilled, (state, action) => {
-                 // Update the specific prediction in the list
-                 const updated = action.payload.data;
-                 const index = state.predictionsList.findIndex(p => p.id === updated.id);
-                 if (index !== -1) {
-                     state.predictionsList[index] = updated;
-                 }
             })
             .addCase(logoutUserAsync.fulfilled, (state) => {
                 state.prediction_id = NaN;
@@ -234,5 +129,19 @@ const predictionsSlice = createSlice({
     }
 });
 
-export const { setPredictionId, setCount, setError, setPredictionData } = predictionsSlice.actions;
+export const {
+    setPredictionId,
+    setCount,
+    setError,
+    setPredictionData,
+    setPredictionsList,
+    setPredictionDetails,
+    removeAuthorFromState,
+    updateAuthorStageInState,
+    updatePredictionStatusInState,
+    updatePredictionInList,
+    updatePredictionStatusInList,
+    resetPredictionState
+} = predictionsSlice.actions;
+
 export default predictionsSlice.reducer;

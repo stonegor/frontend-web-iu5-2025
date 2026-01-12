@@ -2,7 +2,16 @@ import { type FC, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { getPrediction, deletePrediction, updatePrediction, submitPrediction } from "../slices/predictionsSlice";
+import { 
+  setPredictionDetails, 
+  removeAuthorFromState, 
+  updateAuthorStageInState, 
+  updatePredictionStatusInState, 
+  setPredictionData, 
+  resetPredictionState,
+  setError
+} from "../slices/predictionsSlice";
+import { api } from "../api";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS, ROUTES } from "../routes";
 import { UserSearch, Save } from "lucide-react";
@@ -20,11 +29,21 @@ export const PredictionPage: FC = () => {
 
   const [corpus, setCorpus] = useState("");
 
+  const fetchPrediction = async (predictionId: string) => {
+    try {
+      const response = await api.authorPredictions.authorPredictionsRead(predictionId);
+      dispatch(setPredictionDetails(response.data));
+    } catch (error) {
+      dispatch(setError("Ошибка при загрузке предсказания"));
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     if (id && id !== 'undefined') {
-      dispatch(getPrediction(id));
+      fetchPrediction(id);
     }
-  }, [dispatch, id]);
+  }, [id, dispatch]);
 
   useEffect(() => {
     if (predictionData.corpus) {
@@ -35,14 +54,24 @@ export const PredictionPage: FC = () => {
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
     if (id) {
-      await dispatch(deletePrediction(id));
-      navigate(ROUTES.AUTHORS);
+      try {
+        await api.authorPredictions.authorPredictionsDelete(id);
+        dispatch(resetPredictionState());
+        navigate(ROUTES.AUTHORS);
+      } catch (error) {
+        dispatch(setError("Ошибка при удалении предсказания"));
+      }
     }
   };
 
   const handleSave = async () => {
     if (id) {
-      await dispatch(updatePrediction({ id, data: { corpus } }));
+      try {
+        const response = await api.authorPredictions.authorPredictionsUpdate(id, { corpus });
+        dispatch(setPredictionData({ corpus: response.data.corpus }));
+      } catch (error) {
+        dispatch(setError("Ошибка при обновлении предсказания"));
+      }
     }
   };
 
@@ -54,11 +83,34 @@ export const PredictionPage: FC = () => {
   const handleSubmitPrediction = async () => {
     if (id) {
       try {
-        await dispatch(submitPrediction(id)).unwrap();
+        await api.authorPredictions.authorPredictionsSubmitUpdate(id);
+        dispatch(updatePredictionStatusInState());
         navigate(ROUTES.PREDICTIONS); // Redirect to list after submit
       } catch (err) {
-        // Error is handled in slice
+        dispatch(setError("Ошибка при подтверждении предсказания"));
         console.error("Failed to submit prediction:", err);
+      }
+    }
+  };
+
+  const handleDeleteAuthor = async (authorId: number) => {
+    if (id && authorId) {
+      try {
+        await api.authorPredictions.authorPredictionsAuthorDelete(id, String(authorId));
+        dispatch(removeAuthorFromState(String(authorId)));
+      } catch (error) {
+        dispatch(setError("Ошибка при удалении автора"));
+      }
+    }
+  };
+
+  const handleUpdateStage = async (authorId: number, stage: string) => {
+    if (id && authorId) {
+      try {
+        const response = await api.authorPredictions.authorPredictionsAuthorStageUpdate(id, String(authorId), { stage });
+        dispatch(updateAuthorStageInState({ authorId: String(authorId), stage: response.data.stage }));
+      } catch (error) {
+        dispatch(setError("Ошибка при обновлении стадии"));
       }
     }
   };
@@ -105,12 +157,14 @@ export const PredictionPage: FC = () => {
         {authors.length > 0 ? (
           authors.map((item, index) => (
             <AuthorCard
-              key={(item.author as Author).id || index}
+              key={(item.author as any).id || index}
               author={item.author as Author}
               isDraft={isDraft}
               predictionId={Number(id)}
               stage={item.stage}
               probability={item.probability}
+              onDeleteAuthor={(item.author as any)?.id ? () => handleDeleteAuthor((item.author as any).id!) : undefined}
+              onUpdateStage={(item.author as any)?.id ? (stage) => handleUpdateStage((item.author as any).id!, stage) : undefined}
             />
           ))
         ) : (
