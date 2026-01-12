@@ -1,7 +1,7 @@
-import { type FC } from "react";
+import { type FC, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { type Author } from "../api/Api";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Save } from "lucide-react";
 import defaultAuthor from "/AuthorPlaceholder.png";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
@@ -23,6 +23,12 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
   const location = useLocation();
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
 
+  const [currentStage, setCurrentStage] = useState(stage || "early");
+
+  useEffect(() => {
+    setCurrentStage(stage || "early");
+  }, [stage]);
+
   const isPredictionPage = location.pathname.includes(ROUTES.PREDICTION);
 
   const handleAdd = async (e: React.MouseEvent) => {
@@ -40,9 +46,13 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
     }
   };
 
-  const handleStageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCurrentStage(e.target.value);
+  };
+
+  const handleSaveStage = async () => {
     if (author.id && predictionId) {
-       await dispatch(updateAuthorStage({ predictionId: String(predictionId), authorId: String(author.id), stage: e.target.value }));
+      await dispatch(updateAuthorStage({ predictionId: String(predictionId), authorId: String(author.id), stage: currentStage }));
     }
   };
 
@@ -68,17 +78,31 @@ export const AuthorCard: FC<AuthorCardProps> = ({ author, predictionId, isDraft,
             </p>
             <div className="dropdown">
               <label htmlFor={`period-${author.id}`}>Период:</label>
-              <select
-                name="period"
-                id={`period-${author.id}`}
-                defaultValue={stage?.toLowerCase() || "early"}
-                onChange={handleStageChange}
-                disabled={!isDraft}
-              >
-                <option value="early">Ранний</option>
-                <option value="mature">Зрелый</option>
-                <option value="late">Поздний</option>
-              </select>
+              <div className="d-flex gap-2 align-items-center">
+                <select
+                  name="period"
+                  id={`period-${author.id}`}
+                  value={currentStage}
+                  onChange={handleStageChange}
+                  disabled={!isDraft}
+                >
+                  <option value="early">Ранний</option>
+                  <option value="mature">Зрелый</option>
+                  <option value="late">Поздний</option>
+                </select>
+                {isDraft && (
+                  <Button 
+                    variant="outline-primary" 
+                    size="sm" 
+                    className="p-1 d-flex align-items-center justify-content-center" 
+                    style={{ width: '30px', height: '30px' }}
+                    onClick={handleSaveStage}
+                    title="Сохранить этап"
+                  >
+                    <Save size={16} />
+                  </Button>
+                )}
+              </div>
             </div>
             {probability !== undefined && (
               <div className="probability-display">Вероятность: {probability.toFixed(2)}</div>

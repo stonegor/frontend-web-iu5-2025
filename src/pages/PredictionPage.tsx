@@ -5,10 +5,11 @@ import type { AppDispatch, RootState } from "../store";
 import { getPrediction, deletePrediction, updatePrediction, submitPrediction } from "../slices/predictionsSlice";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS, ROUTES } from "../routes";
-import { UserSearch } from "lucide-react";
+import { UserSearch, Save } from "lucide-react";
 import { AuthorCard } from "../components/AuthorCard";
 import type { Author } from "../api/Api";
 import { StatusBadge } from "../components/StatusBadge";
+import { Button } from "react-bootstrap";
 
 export const PredictionPage: FC = () => {
   const { id } = useParams();
@@ -45,6 +46,11 @@ export const PredictionPage: FC = () => {
     }
   };
 
+  const handleSaveCorpus = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await handleSave();
+  };
+
   const handleSubmitPrediction = async () => {
     if (id) {
       try {
@@ -77,13 +83,24 @@ export const PredictionPage: FC = () => {
             placeholder="Введите текст для анализа"
             value={corpus}
             onChange={(e) => setCorpus(e.target.value)}
-            onBlur={handleSave}
+            // onBlur={handleSave}
             disabled={!isDraft}
           ></textarea>
+          {isDraft && (
+            <div className="mt-2 d-flex justify-content-end">
+              <button 
+                className="action-button d-flex align-items-center gap-2" 
+                onClick={handleSaveCorpus}
+              >
+                <Save size={16} /> Сохранить текст
+              </button>
+            </div>
+          )}
         </form>
       </div>
 
       <h2 className="authors-list-header">Результаты</h2>
+      
       <div className="results-cards">
         {authors.length > 0 ? (
           authors.map((item, index) => (
