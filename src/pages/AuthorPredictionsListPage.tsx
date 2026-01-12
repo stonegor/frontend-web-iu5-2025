@@ -5,15 +5,15 @@ import { Link } from "react-router-dom";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { RussianDatePicker } from "../components/RussianDatePicker";
 import { ROUTES, ROUTE_LABELS } from "../routes";
-import { setPredictionsList, updatePredictionStatusInList, setError } from "../slices/predictionsSlice";
+import { setAuthorPredictionsList, updateAuthorPredictionStatusInList, setError } from "../slices/authorPredictionsSlice";
 import type { AppDispatch, RootState } from "../store";
 import { FileText, Check, X } from "lucide-react";
 import { StatusBadge } from "../components/StatusBadge";
 import { api } from "../api";
 
-export const PredictionsListPage: FC = () => {
+export const AuthorPredictionsListPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { predictionsList, error } = useSelector((state: RootState) => state.predictions);
+  const { authorPredictionsList, error } = useSelector((state: RootState) => state.authorPredictions);
   const { isStaff } = useSelector((state: RootState) => state.user);
   const [loading, setLoading] = useState(false);
 
@@ -22,15 +22,15 @@ export const PredictionsListPage: FC = () => {
   const [endDate, setEndDate] = useState("");
   const [creatorFilter, setCreatorFilter] = useState("");
 
-  const fetchPredictions = async () => {
-    if (predictionsList.length === 0) setLoading(true);
+  const fetchAuthorPredictions = async () => {
+    if (authorPredictionsList.length === 0) setLoading(true);
     try {
       const response = await api.authorPredictions.authorPredictionsList({
         status: statusFilter || undefined,
         start_date: startDate || undefined,
         end_date: endDate || undefined
       });
-      dispatch(setPredictionsList(response.data));
+      dispatch(setAuthorPredictionsList(response.data));
     } catch (err) {
       dispatch(setError("Ошибка при загрузке списка предсказаний"));
     } finally {
@@ -39,8 +39,8 @@ export const PredictionsListPage: FC = () => {
   };
 
   useEffect(() => {
-    fetchPredictions();
-    const interval = setInterval(fetchPredictions, 2000);
+    fetchAuthorPredictions();
+    const interval = setInterval(fetchAuthorPredictions, 2000);
     return () => clearInterval(interval);
   }, [dispatch, statusFilter, startDate, endDate]);
 
@@ -48,20 +48,20 @@ export const PredictionsListPage: FC = () => {
     try {
       await api.authorPredictions.authorPredictionsCompleteUpdate(String(id), { action });
       const newStatus = action === 'complete' ? 'COMPLETED' : 'REJECTED';
-      dispatch(updatePredictionStatusInList({ id, status: newStatus }));
+      dispatch(updateAuthorPredictionStatusInList({ id, status: newStatus }));
     } catch (err) {
       dispatch(setError("Ошибка при изменении статуса предсказания"));
     }
   };
 
-  const displayedPredictions = predictionsList.filter(p => {
+  const displayedAuthorPredictions = authorPredictionsList.filter(p => {
     if (!creatorFilter) return true;
     return p.client_email?.toLowerCase().includes(creatorFilter.toLowerCase());
   });
 
   return (
     <div className="container mt-4">
-      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.PREDICTIONS }]} />
+      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.AUTHOR_PREDICTIONS }]} />
 
       <h1 className="page-title mb-4">
         <FileText strokeWidth={3} className="me-2" />
@@ -111,7 +111,7 @@ export const PredictionsListPage: FC = () => {
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {loading && predictionsList.length === 0 ? (
+      {loading && authorPredictionsList.length === 0 ? (
         <div className="d-flex justify-content-center">
           <Spinner animation="border" />
         </div>
@@ -129,8 +129,8 @@ export const PredictionsListPage: FC = () => {
             </tr>
           </thead>
           <tbody>
-            {displayedPredictions.length > 0 ? (
-              displayedPredictions.map((prediction, index) => (
+            {displayedAuthorPredictions.length > 0 ? (
+              displayedAuthorPredictions.map((prediction, index) => (
                 <tr key={prediction.id || index}>
                   <td>{prediction.id}</td>
                   <td>{prediction.client_email}</td>
@@ -150,7 +150,7 @@ export const PredictionsListPage: FC = () => {
                   <td>
                     <div className="d-flex gap-2">
                       {prediction.id ? (
-                        <Link to={`${ROUTES.PREDICTION}/${prediction.id}`} className="small-action-button">
+                        <Link to={`${ROUTES.AUTHOR_PREDICTION}/${prediction.id}`} className="small-action-button">
                           Просмотр
                         </Link>
                       ) : null}

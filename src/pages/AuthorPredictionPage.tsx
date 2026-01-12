@@ -2,15 +2,15 @@ import { type FC, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { 
-  setPredictionDetails, 
-  removeAuthorFromState, 
-  updateAuthorStageInState, 
-  updatePredictionStatusInState, 
-  setPredictionData, 
-  resetPredictionState,
+import {
+  setAuthorPredictionDetails,
+  removeAuthorFromState,
+  updateAuthorStageInState,
+  updateAuthorPredictionStatusInState,
+  setAuthorPredictionData,
+  resetAuthorPredictionState,
   setError
-} from "../slices/predictionsSlice";
+} from "../slices/authorPredictionsSlice";
 import { api } from "../api";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { ROUTE_LABELS, ROUTES } from "../routes";
@@ -18,21 +18,20 @@ import { UserSearch, Save } from "lucide-react";
 import { AuthorCard } from "../components/AuthorCard";
 import type { Author } from "../api/Api";
 import { StatusBadge } from "../components/StatusBadge";
-import { Button } from "react-bootstrap";
 
-export const PredictionPage: FC = () => {
+export const AuthorPredictionPage: FC = () => {
   const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { authors, predictionData, isDraft } = useSelector((state: RootState) => state.predictions);
+  const { authors, authorPredictionData, isDraft } = useSelector((state: RootState) => state.authorPredictions);
 
   const [corpus, setCorpus] = useState("");
 
-  const fetchPrediction = async (predictionId: string) => {
+  const fetchAuthorPrediction = async (authorPredictionId: string) => {
     try {
-      const response = await api.authorPredictions.authorPredictionsRead(predictionId);
-      dispatch(setPredictionDetails(response.data));
+      const response = await api.authorPredictions.authorPredictionsRead(authorPredictionId);
+      dispatch(setAuthorPredictionDetails(response.data));
     } catch (error) {
       dispatch(setError("Ошибка при загрузке предсказания"));
       console.error(error);
@@ -41,22 +40,22 @@ export const PredictionPage: FC = () => {
 
   useEffect(() => {
     if (id && id !== 'undefined') {
-      fetchPrediction(id);
+      fetchAuthorPrediction(id);
     }
   }, [id, dispatch]);
 
   useEffect(() => {
-    if (predictionData.corpus) {
-      setCorpus(predictionData.corpus);
+    if (authorPredictionData.corpus) {
+      setCorpus(authorPredictionData.corpus);
     }
-  }, [predictionData]);
+  }, [authorPredictionData]);
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
     if (id) {
       try {
         await api.authorPredictions.authorPredictionsDelete(id);
-        dispatch(resetPredictionState());
+        dispatch(resetAuthorPredictionState());
         navigate(ROUTES.AUTHORS);
       } catch (error) {
         dispatch(setError("Ошибка при удалении предсказания"));
@@ -68,7 +67,7 @@ export const PredictionPage: FC = () => {
     if (id) {
       try {
         const response = await api.authorPredictions.authorPredictionsUpdate(id, { corpus });
-        dispatch(setPredictionData({ corpus: response.data.corpus }));
+        dispatch(setAuthorPredictionData({ corpus: response.data.corpus }));
       } catch (error) {
         dispatch(setError("Ошибка при обновлении предсказания"));
       }
@@ -80,12 +79,12 @@ export const PredictionPage: FC = () => {
     await handleSave();
   };
 
-  const handleSubmitPrediction = async () => {
+  const handleSubmitAuthorPrediction = async () => {
     if (id) {
       try {
         await api.authorPredictions.authorPredictionsSubmitUpdate(id);
-        dispatch(updatePredictionStatusInState());
-        navigate(ROUTES.PREDICTIONS); // Redirect to list after submit
+        dispatch(updateAuthorPredictionStatusInState());
+        navigate(ROUTES.AUTHOR_PREDICTIONS); // Redirect to list after submit
       } catch (err) {
         dispatch(setError("Ошибка при подтверждении предсказания"));
         console.error("Failed to submit prediction:", err);
@@ -118,18 +117,18 @@ export const PredictionPage: FC = () => {
   if (!id || id === 'undefined' || id === 'null') return <div className="alert alert-warning">ID не найден или некорректен.</div>;
 
   return (
-    <div className="prediction-detail-container">
-      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.PREDICTION }]} />
+    <div className="author-prediction-detail-container">
+      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.AUTHOR_PREDICTION }]} />
       <h1 className="page-title">
         <div className="d-flex align-items-center gap-3">
           <UserSearch strokeWidth={3} />
           <span>Предсказание</span>
-          {!isDraft && <StatusBadge status={predictionData.status} />}
+          {!isDraft && <StatusBadge status={authorPredictionData.status} />}
         </div>
       </h1>
 
       <div className="search-and-summary">
-        <form className="search-form prediction-form">
+        <form className="search-form author-prediction-form">
           <textarea
             name="author_name"
             placeholder="Введите текст для анализа"
@@ -140,8 +139,8 @@ export const PredictionPage: FC = () => {
           ></textarea>
           {isDraft && (
             <div className="mt-2 d-flex justify-content-end">
-              <button 
-                className="action-button d-flex align-items-center gap-2" 
+              <button
+                className="action-button d-flex align-items-center gap-2"
                 onClick={handleSaveCorpus}
               >
                 <Save size={16} /> Сохранить текст
@@ -152,7 +151,7 @@ export const PredictionPage: FC = () => {
       </div>
 
       <h2 className="authors-list-header">Результаты</h2>
-      
+
       <div className="results-cards">
         {authors.length > 0 ? (
           authors.map((item, index) => (
@@ -177,7 +176,7 @@ export const PredictionPage: FC = () => {
           <button className="action-button" onClick={handleDelete}>
             Удалить
           </button>
-          <button className="action-button" onClick={handleSubmitPrediction}>
+          <button className="action-button" onClick={handleSubmitAuthorPrediction}>
             Подтвердить
           </button>
         </div>

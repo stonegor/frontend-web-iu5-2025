@@ -1,13 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authorsReducer from "./slices/authorsSlice";
 import userReducer from "./slices/userSlice";
-import predictionsReducer from "./slices/predictionsSlice";
+import authorPredictionsReducer from "./slices/authorPredictionsSlice";
 
 const store = configureStore({
     reducer: combineReducers({
         authors: authorsReducer,
         user: userReducer,
-        predictions: predictionsReducer
+        authorPredictions: authorPredictionsReducer
     })
 });
 

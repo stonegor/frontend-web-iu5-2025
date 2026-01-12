@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { api } from "../api";
 import type { Author } from "../api/Api";
 import { AUTHORS_MOCK } from "../api/mock";
-import { setPredictionId, setCount } from "./predictionsSlice";
+import { setAuthorPredictionId, setCount } from "./authorPredictionsSlice";
 import { logoutUserAsync } from "./userSlice";
 
 interface AuthorsState {
@@ -35,12 +35,12 @@ export const getAuthorsList = createAsyncThunk(
             try {
                 const draftResponse = await api.authorPredictions.authorPredictionsDraftIconList();
                 if (draftResponse.data) {
-                    dispatch(setPredictionId(draftResponse.data.id));
+                    dispatch(setAuthorPredictionId(draftResponse.data.id));
                     dispatch(setCount(draftResponse.data.count));
                 }
             } catch (e) {
                 // If error (e.g. not auth), clear draft info
-                dispatch(setPredictionId(NaN));
+                dispatch(setAuthorPredictionId(NaN));
                 dispatch(setCount(NaN));
             }
 

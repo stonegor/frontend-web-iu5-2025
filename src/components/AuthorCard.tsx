@@ -5,7 +5,7 @@ import { Plus, X, Save } from "lucide-react";
 import defaultAuthor from "/AuthorPlaceholder.png";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
-import { addAuthorToPrediction } from "../slices/predictionsSlice";
+import { addAuthorToAuthorPrediction } from "../slices/authorPredictionsSlice";
 import { getAuthorsList } from "../slices/authorsSlice";
 import { Button } from "react-bootstrap";
 import { ROUTES } from "../routes";
@@ -39,12 +39,12 @@ export const AuthorCard: FC<AuthorCardProps> = ({
     setCurrentStage(stage || "early");
   }, [stage]);
 
-  const isPredictionPage = location.pathname.includes(ROUTES.PREDICTION);
+  const isPredictionPage = location.pathname.includes(ROUTES.AUTHOR_PREDICTION);
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (author.id) {
-      await dispatch(addAuthorToPrediction(author.id));
+      await dispatch(addAuthorToAuthorPrediction(author.id));
       await dispatch(getAuthorsList());
     }
   };

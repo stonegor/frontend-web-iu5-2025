@@ -17,7 +17,7 @@ export const AuthorsPage: FC = () => {
   const loading = useAuthorsLoading();
   
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
-  const { prediction_id, count } = useSelector((state: RootState) => state.predictions);
+  const { author_prediction_id, count } = useSelector((state: RootState) => state.authorPredictions);
 
   useEffect(() => {
     dispatch(getAuthorsList());
@@ -28,7 +28,7 @@ export const AuthorsPage: FC = () => {
       dispatch(getAuthorsList());
   };
   
-  const isCartActive = isAuthenticated && prediction_id && !isNaN(prediction_id);
+  const isCartActive = isAuthenticated && author_prediction_id && !isNaN(author_prediction_id);
 
   return (
     <div>
@@ -73,17 +73,17 @@ export const AuthorsPage: FC = () => {
 
       <div className="meal-button-container">
         <Link
-          to={isCartActive ? `${ROUTES.PREDICTION}/${prediction_id}` : "#"}
+          to={isCartActive ? `${ROUTES.AUTHOR_PREDICTION}/${author_prediction_id}` : "#"}
           className={`meal-link ${!isCartActive ? "disabled" : ""}`}
           onClick={(e) => !isCartActive && e.preventDefault()}
         >
-          <div className="prediction-button">
-            <div className="prediction-left">
+          <div className="author-prediction-button">
+            <div className="author-prediction-left">
               Выбрано
               <br />
               авторов: {count || 0}
             </div>
-            <div className="prediction-right">
+            <div className="author-prediction-right">
               Продолжить
               <UserSearch strokeWidth={3} />
             </div>

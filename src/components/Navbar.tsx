@@ -30,8 +30,8 @@ const AppNavbar: FC = () => {
             </Nav.Link>
             {isAuthenticated && (
               <>
-                <Nav.Link as={Link} to={ROUTES.PREDICTIONS} className="custom-nav-link">
-                    {ROUTE_LABELS.PREDICTIONS}
+                <Nav.Link as={Link} to={ROUTES.AUTHOR_PREDICTIONS} className="custom-nav-link">
+                    {ROUTE_LABELS.AUTHOR_PREDICTIONS}
                 </Nav.Link>
                 <Nav.Link as={Link} to={ROUTES.PROFILE} className="custom-nav-link">
                     {username}

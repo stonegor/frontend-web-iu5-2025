@@ -1,11 +1,11 @@
 import { api } from './index';
 
-export interface DraftPredictionIcon {
+export interface DraftAuthorPredictionIcon {
   id?: number;
   count?: number;
 }
 
-export const getDraftPrediction = async (): Promise<DraftPredictionIcon | null> => {
+export const getDraftAuthorPrediction = async (): Promise<DraftAuthorPredictionIcon | null> => {
   try {
     const response = await api.authorPredictions.authorPredictionsDraftIconList();
     return response.data;

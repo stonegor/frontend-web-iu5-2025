@@ -3,33 +3,33 @@ import { api } from '../api';
 import type { PredictionCandidate, AuthorPredictionUpdate, AuthorPrediction } from '../api/Api';
 import { logoutUserAsync } from './userSlice';
 
-interface PredictionsState {
-    prediction_id: number;
+interface AuthorPredictionsState {
+    author_prediction_id: number;
     count: number;
 
     authors: PredictionCandidate[];
-    predictionData: {
+    authorPredictionData: {
         corpus?: string;
         status?: "DRAFT" | "DELETED" | "FORMED" | "COMPLETED" | "REJECTED";
     };
-    predictionsList: AuthorPrediction[];
+    authorPredictionsList: AuthorPrediction[];
     isDraft: boolean;
     error: string | null;
 }
 
-const initialState: PredictionsState = {
-    prediction_id: NaN,
+const initialState: AuthorPredictionsState = {
+    author_prediction_id: NaN,
     count: NaN,
     authors: [],
-    predictionData: {},
-    predictionsList: [],
+    authorPredictionData: {},
+    authorPredictionsList: [],
     isDraft: false,
     error: null,
 };
 
 // Keep this one as it might be used by AuthorsPage/AuthorCard in list view
-export const addAuthorToPrediction = createAsyncThunk(
-    'predictions/addAuthorToPrediction',
+export const addAuthorToAuthorPrediction = createAsyncThunk(
+    'authorPredictions/addAuthorToAuthorPrediction',
     async (authorId: number, { rejectWithValue }) => {
         try {
             const response = await api.authorPredictions.authorPredictionsDraftCreate({ author_id: authorId });
@@ -40,12 +40,12 @@ export const addAuthorToPrediction = createAsyncThunk(
     }
 );
 
-const predictionsSlice = createSlice({
-    name: 'predictions',
+const authorPredictionsSlice = createSlice({
+    name: 'authorPredictions',
     initialState,
     reducers: {
-        setPredictionId: (state, action: PayloadAction<number | undefined>) => {
-            state.prediction_id = action.payload ?? NaN;
+        setAuthorPredictionId: (state, action: PayloadAction<number | undefined>) => {
+            state.author_prediction_id = action.payload ?? NaN;
         },
         setCount: (state, action: PayloadAction<number | undefined>) => {
             state.count = action.payload ?? NaN;
@@ -53,19 +53,19 @@ const predictionsSlice = createSlice({
         setError: (state, action: PayloadAction<string | null>) => {
             state.error = action.payload;
         },
-        setPredictionData: (state, action: PayloadAction<AuthorPredictionUpdate>) => {
-            state.predictionData = { ...state.predictionData, ...action.payload };
+        setAuthorPredictionData: (state, action: PayloadAction<AuthorPredictionUpdate>) => {
+            state.authorPredictionData = { ...state.authorPredictionData, ...action.payload };
         },
-        setPredictionsList: (state, action: PayloadAction<AuthorPrediction[]>) => {
-            state.predictionsList = action.payload;
+        setAuthorPredictionsList: (state, action: PayloadAction<AuthorPrediction[]>) => {
+            state.authorPredictionsList = action.payload;
         },
-        setPredictionDetails: (state, action: PayloadAction<any>) => {
+        setAuthorPredictionDetails: (state, action: PayloadAction<any>) => {
             const data = action.payload;
             state.authors = data.authors || [];
-            state.predictionData = { corpus: data.corpus, status: data.status };
+            state.authorPredictionData = { corpus: data.corpus, status: data.status };
             state.isDraft = data.status === 'DRAFT';
             if (data.id) {
-                state.prediction_id = data.id;
+                state.author_prediction_id = data.id;
             }
         },
         removeAuthorFromState: (state, action: PayloadAction<string>) => {
@@ -78,51 +78,54 @@ const predictionsSlice = createSlice({
                 author.stage = action.payload.stage as any;
             }
         },
-        updatePredictionStatusInState: (state) => {
+        updateAuthorPredictionStatusInState: (state) => {
             state.isDraft = false;
-            state.predictionData.status = "FORMED";
-            state.prediction_id = NaN;
+            state.authorPredictionData.status = "FORMED";
+            state.author_prediction_id = NaN;
             state.count = NaN;
         },
-        updatePredictionInList: (state, action: PayloadAction<AuthorPrediction>) => {
+        updateAuthorPredictionInList: (state, action: PayloadAction<AuthorPrediction>) => {
             const updated = action.payload;
-            const index = state.predictionsList.findIndex(p => p.id === updated.id);
+            const index = state.authorPredictionsList.findIndex(p => p.id === updated.id);
             if (index !== -1) {
-                state.predictionsList[index] = updated;
+                state.authorPredictionsList[index] = updated;
             }
         },
-        updatePredictionStatusInList: (state, action: PayloadAction<{ id: number, status: string }>) => {
+        updateAuthorPredictionStatusInList: (state, action: PayloadAction<{ id: number, status: string }>) => {
             const { id, status } = action.payload;
-            const index = state.predictionsList.findIndex(p => p.id === id);
+            const index = state.authorPredictionsList.findIndex(p => p.id === id);
             if (index !== -1) {
-                state.predictionsList[index].status = status as any;
+                state.authorPredictionsList[index].status = status as any;
             }
         },
-        resetPredictionState: (state) => {
-            state.prediction_id = NaN;
+        resetAuthorPredictionState: (state) => {
+            state.author_prediction_id = NaN;
             state.count = NaN;
             state.authors = [];
-            state.predictionData = {};
+            state.authorPredictionData = {};
             state.isDraft = false;
         }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(addAuthorToPrediction.fulfilled, (state, action) => {
+            .addCase(addAuthorToAuthorPrediction.fulfilled, (state, action) => {
                 const data = action.payload as any;
-                if (data.id) {
-                    state.prediction_id = data.id;
+                // Backend returns { message: string, author_prediction: AuthorPrediction }
+                const prediction = data.author_prediction || data; 
+                
+                if (prediction.id) {
+                    state.author_prediction_id = prediction.id;
                 }
-                if (data.authors) {
-                    state.count = data.authors.length;
+                if (prediction.authors) {
+                    state.count = prediction.authors.length;
                 }
             })
             .addCase(logoutUserAsync.fulfilled, (state) => {
-                state.prediction_id = NaN;
+                state.author_prediction_id = NaN;
                 state.count = NaN;
                 state.authors = [];
-                state.predictionData = {};
-                state.predictionsList = [];
+                state.authorPredictionData = {};
+                state.authorPredictionsList = [];
                 state.isDraft = false;
                 state.error = null;
             });
@@ -130,18 +133,18 @@ const predictionsSlice = createSlice({
 });
 
 export const {
-    setPredictionId,
+    setAuthorPredictionId,
     setCount,
     setError,
-    setPredictionData,
-    setPredictionsList,
-    setPredictionDetails,
+    setAuthorPredictionData,
+    setAuthorPredictionsList,
+    setAuthorPredictionDetails,
     removeAuthorFromState,
     updateAuthorStageInState,
-    updatePredictionStatusInState,
-    updatePredictionInList,
-    updatePredictionStatusInList,
-    resetPredictionState
-} = predictionsSlice.actions;
+    updateAuthorPredictionStatusInState,
+    updateAuthorPredictionInList,
+    updateAuthorPredictionStatusInList,
+    resetAuthorPredictionState
+} = authorPredictionsSlice.actions;
 
-export default predictionsSlice.reducer;
+export default authorPredictionsSlice.reducer;

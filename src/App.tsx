@@ -3,8 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { AuthorsPage } from "./pages/AuthorsPage";
 import { AuthorDetailPage } from "./pages/AuthorDetailPage";
-import { PredictionPage } from "./pages/PredictionPage";
-import { PredictionsListPage } from "./pages/PredictionsListPage";
+import { AuthorPredictionPage } from "./pages/AuthorPredictionPage";
+import { AuthorPredictionsListPage } from "./pages/AuthorPredictionsListPage";
 import { HomePage } from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -31,10 +31,10 @@ const App: FC = () => {
         }
       />
       <Route
-        path={ROUTES.PREDICTIONS}
+        path={ROUTES.AUTHOR_PREDICTIONS}
         element={
           <Layout>
-            <PredictionsListPage />
+            <AuthorPredictionsListPage />
           </Layout>
         }
       />
@@ -47,10 +47,10 @@ const App: FC = () => {
         }
       />
       <Route
-        path={`${ROUTES.PREDICTION}/:id`}
+        path={`${ROUTES.AUTHOR_PREDICTION}/:id`}
         element={
           <Layout>
-            <PredictionPage />
+            <AuthorPredictionPage />
           </Layout>
         }
       />
