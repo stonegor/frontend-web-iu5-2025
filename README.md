@@ -6,7 +6,7 @@
 
 ### Ссылки
 
-- **GitHubPages**: https://stonegor.github.io/frontend-web-iu5-2025
-- **Бэкенд (основной веб-сервис)**: https://github.com/stonegor/backend-web-iu5-2025
-- **Бэкенд (асинхронный сервис)**: https://github.com/stonegor/async-service
-- **Фронтенд**: https://github.com/stonegor/frontend-web-iu5-2025
+- **GitHubPages**: https://stonegor.github.io/author-prediction-frontend-web-iu5-2025
+- **Бэкенд (основной веб-сервис)**: https://github.com/stonegor/author-prediction-backend-web-iu5-2025
+- **Бэкенд (асинхронный сервис)**: https://github.com/stonegor/author-prediction-async-service
+- **Фронтенд**: https://github.com/stonegor/author-prediction-frontend-web-iu5-2025
