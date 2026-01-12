@@ -8,5 +8,5 @@
 
 - **GitHubPages**: https://stonegor.github.io/author-prediction-frontend-web-iu5-2025
 - **Бэкенд (основной веб-сервис)**: https://github.com/stonegor/author-prediction-backend-web-iu5-2025
-- **Бэкенд (асинхронный сервис)**: https://github.com/stonegor/author-prediction-async-service
+- **Бэкенд (асинхронный сервис)**: https://github.com/stonegor/author-prediction-async-service-web-iu5-2025
 - **Фронтенд**: https://github.com/stonegor/author-prediction-frontend-web-iu5-2025
