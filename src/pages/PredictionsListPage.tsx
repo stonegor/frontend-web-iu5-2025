@@ -3,6 +3,7 @@ import { Table, Spinner, Form, Button, Row, Col, Badge } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Breadcrumbs } from "../components/Breadcrumbs";
+import { RussianDatePicker } from "../components/RussianDatePicker";
 import { ROUTES, ROUTE_LABELS } from "../routes";
 import { setPredictionsList, updatePredictionStatusInList, setError } from "../slices/predictionsSlice";
 import type { AppDispatch, RootState } from "../store";
@@ -85,13 +86,13 @@ export const PredictionsListPage: FC = () => {
           <Col md={3}>
             <Form.Group>
               <Form.Label>Дата начала</Form.Label>
-              <Form.Control type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              <RussianDatePicker value={startDate} onChange={setStartDate} />
             </Form.Group>
           </Col>
           <Col md={3}>
             <Form.Group>
               <Form.Label>Дата окончания</Form.Label>
-              <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+              <RussianDatePicker value={endDate} onChange={setEndDate} />
             </Form.Group>
           </Col>
           <Col md={3}>
