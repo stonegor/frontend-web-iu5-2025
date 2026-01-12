@@ -61,6 +61,8 @@ export interface AuthorPrediction {
   id?: number;
   /** Status */
   status?: "DRAFT" | "DELETED" | "FORMED" | "COMPLETED" | "REJECTED";
+  /** Creation datetime */
+  creation_datetime?: string;
   /**
    * Corpus
    * @minLength 1

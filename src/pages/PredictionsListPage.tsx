@@ -120,6 +120,7 @@ export const PredictionsListPage: FC = () => {
             <tr>
               <th>#</th>
               <th>Email</th>
+              <th>Дата создания</th>
               <th>Статус</th>
               <th>Рассчитано</th>
               <th>Текст (корпус)</th>
@@ -132,6 +133,11 @@ export const PredictionsListPage: FC = () => {
                 <tr key={prediction.id || index}>
                   <td>{prediction.id}</td>
                   <td>{prediction.client_email}</td>
+                  <td>
+                    {prediction.creation_datetime
+                      ? new Date(prediction.creation_datetime).toLocaleDateString('ru-RU')
+                      : "-"}
+                  </td>
                   <td><StatusBadge status={prediction.status} /></td>
                   <td>{prediction.calculated_candidates_count ?? 0}</td>
                   <td>
@@ -174,7 +180,7 @@ export const PredictionsListPage: FC = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center">
+                <td colSpan={7} className="text-center">
                   Заявок не найдено.
                 </td>
               </tr>
